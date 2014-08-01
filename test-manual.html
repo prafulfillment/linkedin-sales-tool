@@ -1,0 +1,51 @@
+	<html>
+<head>
+  <script src="https://cdn.firebase.com/js/client/1.0.15/firebase.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="../css/example.css">
+</head>
+<body>
+<table id="leaderboardTable"></table>
+<input type="text" id="nameInput" placeholder="Name">
+<input type="text" id="idInput" placeholder="id">
+<input vtype="text" id="commentInput" placeholder="comment">
+<input type="text" id="urlInput" placeholder="url">
+<input type="text" id="senderInput" placeholder="James/Praful">
+<input type="text" id="dateInput" placeholder="date">
+<script>
+  
+  // Create our Firebase reference
+  var scoreListRef = new Firebase('https://blinding-fire-6559.firebaseio.com//userList');
+  
+  function getToday() {
+    var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+	if(dd<10) {
+  	  dd='0'+dd
+	} 
+	if(mm<10) {
+    	mm='0'+mm
+	} 
+	today = mm+'/'+dd+'/'+yyyy;
+    return today;
+  }
+  
+  // When the user presses enter on scoreInput, add the score, and update the highest score.
+  $("#nameInput").keypress(function (e) {
+    if (e.keyCode == 13) {
+        var name = $("#nameInput").val();
+      var id = Number($("#idInput").val());
+      var comment = $("#commentInput").val();
+      var url = $("#urlInput").val();
+      var sender = $("#senderInput").val();
+      var date = $("#dateInput").val();// getToday();
+      var userScoreRef = scoreListRef.child(id);
+   
+      userScoreRef.set({name:name, id:id, comment:comment, url:url, sender:sender, date:date});
+    }
+  });
+</script>
+</body>
+</html>
