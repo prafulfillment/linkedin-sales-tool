@@ -12,6 +12,10 @@ test-retreive.html is a working example for retrieving all the userids in our da
 
 ### How do I get set up? ###
 
+Download the latest vagrant build with:
+
+vagrant box add https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box
+
 Run the program with:
 
 casperjs test.js
