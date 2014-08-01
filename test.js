@@ -81,14 +81,21 @@ var captureComments = function() {
   return Array.prototype.map.call(comments, function(e) {
     var comment = {}
     comment.name = e.querySelector('p.commenter').innerText;
-    names = e.querySelector('p.commenter').innerText.split(' ');
-    comment.fname = names[0];
-    comment.lname = names[names.length-1];
-    comment.byline = e.querySelector('p.commenter-headline').innerText
-    comment.comment = e.querySelector('p.comment-body').innerText;
-    comment.likes = e.querySelector('a.like-comment').innerText.replace( /[^\d]+/g, '') || 0;
-    comment.date = e.querySelector('li.timestamp').innerText;
-    comment.userID = e.querySelector('a.commenter').href.split('memberID=')[1];
+    var names = e.querySelector('p.commenter').innerText.split(' ');
+    comment['fname'] = names[0];
+    comment['lname'] = names[names.length-1];
+    comment['byline'] = e.querySelector('p.commenter-headline').innerText
+    comment['comment'] = e.querySelector('p.comment-body').innerText;
+    comment['likes'] = e.querySelector('a.like-comment').innerText.replace( /[^\d]+/g, '') || 0;
+    comment['date'] = e.querySelector('li.timestamp').innerText;
+    comment['userID'] = e.querySelector('a.commenter').href.split('memberID=')[1];
+    var profilePartial = 'https://www.linkedin.com/profile/view?id='
+    comment['profileURL'] = profilePartial + comment.userID;
+    image = e.querySelector('img');
+    comment['image_src'] = image.src;
+    comment['connection'] = '';
+    comment['isFirstDegree'] = '';
+
     return comment;
   });
 }
@@ -130,14 +137,13 @@ casper.waitFor(amILoggedIn, function(){
 
 // Keep loading all comments until we reach the total
 casper.then(function(){
-  var i = 0;
   var total = this.evaluate(function(){ 
     return parseInt(document.querySelector('span.count').innerText) 
   });
 
-  console.log('Total: ' + total);
-  var display = '';
+  this.echo('Total: ' + total);
 
+  var display = '';
   for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
      this.waitFor(
        function(){ 
@@ -159,13 +165,23 @@ casper.then(function(){
   this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
   comments = _.uniq(comments, function(comment) { return comment.name; }); 
-  //comments.splice(0, 10);
   comments.splice(10);
   comments_count = comments.length;
   this.echo('Comments count: ' + comments_count);
 });
 
-var i = 0;
+// View their profile & retrieve connection degree info (1st, 2nd, 3rd)
+// Note: -1 means out of network
+// Side Effect: Will show up on their 'People Viewed Your Profile'
+casper.then(function(){
+  this.each(comments, function(self, comment){
+    this.thenOpen(profileURL, function(){
+      comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
+      comment['isFirstDegree'] = comment['connection'] == 1;
+    });
+  });
+});
+
 // Capture comments from discussion
 // Side Effect: Will send them a message with given pitch
 casper.then(function(){
@@ -173,7 +189,7 @@ casper.then(function(){
     var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
     var messageToID = comment.userID;
     var msgUrl = msgPartial + messageToID
-    console.log('Message URL: ' + msgUrl);
+    this.echo('Message URL: ' + msgUrl);
 
     this.thenOpen(msgUrl, function(){
       this.click('#control_gen_7');
@@ -195,13 +211,22 @@ casper.run(function(){
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
   
   for (var i=0; i<comments_count; i++){ 
-    this.echo(comments[i].name); 
-    this.echo(comments[i].userID); 
+    var comment = comments[i];
+    this.echo(comment.name); 
+    this.echo(comment.userID); 
+    this.echo(comment.degree);
+    this.echo(comment.isFirstDegree);
+    this.echo(comment.image_src);
     
     var messageToID = comment.userID;
     var msgUrl = msgPartial + messageToID
     var userScoreRef = scoreListRef.child(id);
-    userScoreRef.set({name:comments[i].name, id:comments[i].userID, comment:comments[i].comment, url:msgUrl, sender:"James", date:getToday()}); 
+    userScoreRef.set({name:comment.name, 
+                      id:comment.userID, 
+                      comment:comment.comment, 
+                      url:msgUrl, 
+                      sender:auth.user, 
+                      date:getToday()}); 
   }
   this.exit();
 });
