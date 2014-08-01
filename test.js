@@ -40,6 +40,17 @@ GLOBAL CONSTANTS
 // Note: LinkedIn retrieves 6 comments/click
 var LINKEDIN_LOAD_AMOUNT = 6;
 
+// All template fields defiend in `captureComments`
+var PITCH_SUBJECT = _.template('Hello!');
+var PITCH_LINES = ['Hello <%= fname %>,\n', 
+                   'More content here', 
+                   '\nThanks,', 
+                   'Praful']
+var PITCH_BODY = _.template(PITCH_LINES.join('\n'));
+
+/**
+GLOBAL VARIABLES
+**/
 var comments = [];
 var comments_count = 0;
 
@@ -166,14 +177,12 @@ casper.then(function(){
 
     this.thenOpen(msgUrl, function(){
       this.click('#control_gen_7');
-      this.sendKeys('#send-message-subject', 'Hello!');
-      var body = _.template('Hi <%= fname %>, \n \n My name is James and I\'m a co-founder at derivative/d. We help warehouses automate their pallet movement for a low monthly cost. Think Kiva Systems, but on a rental model. \n \n I saw you posted in the thread on optimizing 10% of a warehouse and wanted to learn more about how you currently handle your operations. \n \n Are you available for a quick call later next week? \n \n Cheers, \n James \n derivative/d');
-      this.sendKeys('#send-message-body', body(comment));
+      this.sendKeys('#send-message-subject', PITCH_SUBJECT(comment));
+      this.sendKeys('#send-message-body', PITCH_BODY(comment));
       this.then(function(){
-	// send message
-        //this.click('#send-message-submit');
-        this.capture('/vagrant/message_'+i+'.png');
-        i+=1;
+	     // send message
+         //this.click('#send-message-submit');
+         this.capture('/vagrant/message_'+i+'.png');
       });
     });
   });
