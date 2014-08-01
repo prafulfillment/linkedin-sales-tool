@@ -51,6 +51,7 @@ var groupUrl = 'https://www.linkedin.com/groups/if-you-were-asked-try-4117360.S.
 /**
 Helper Functions
 **/
+
 var amILoggedIn = function() {
   return this.evaluate(function rock(){
     return document.querySelectorAll('li.nav-item').length > 3;
@@ -100,16 +101,20 @@ var getToday = function() {
 /**
 Casper Navigation
 **/
+// Login to LinkedIn
+// TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', function login() {
   this.echo('Logging In...');
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
 
+// Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
   this.echo('Open group...');
   this.open(groupUrl)
 });
 
+// Keep loading all comments until we reach the total
 casper.then(function(){
   var i = 0;
   var total = this.evaluate(function(){ 
@@ -135,6 +140,7 @@ casper.then(function(){
   }
 });
 
+// Capture comments from discussion
 casper.then(function(){
   this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
@@ -146,6 +152,8 @@ casper.then(function(){
 });
 
 var i = 0;
+// Capture comments from discussion
+// Side Effect: Will send them a message with given pitch
 casper.then(function(){
   this.each(comments, function(self, comment){
     var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
@@ -168,6 +176,7 @@ casper.then(function(){
   });
 });
 
+// Output comment information
 casper.run(function(){
   var scoreListRef = new Firebase('https://blinding-fire-6559.firebaseio.com//userList');
   this.echo('\n'+comments_count + ' comments captured.');
