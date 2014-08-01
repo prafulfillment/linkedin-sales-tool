@@ -1,7 +1,7 @@
 var casper = require('casper').create();
 var _ = require('lodash-node');
 var system = require('system');
-phantom.page.injectJs( 'https://cdn.firebase.com/js/client/1.0.15/firebase.js');
+var Firebase = require("firebase");
 
 /**
 ERROR CALLBACKS
