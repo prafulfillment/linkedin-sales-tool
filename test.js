@@ -37,6 +37,9 @@ phantom.onError = function(msg, trace) {
 /**
 GLOBAL CONSTANTS
 **/
+// Note: LinkedIn retrieves 6 comments/click
+var LINKEDIN_LOAD_AMOUNT = 6;
+
 var comments = [];
 var comments_count = 0;
 
@@ -124,7 +127,7 @@ casper.then(function(){
   console.log('Total: ' + total);
   var display = '';
 
-  for (var i=0; i<(total/20); i++) {
+  for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
      this.waitFor(
        function(){ 
           return !this.exists('#inline-pagination.loading'); 
