@@ -54,6 +54,7 @@ GLOBAL VARIABLES
 var comments = [];
 var comments_count = 0;
 
+// TODO: Move out of this file
 var auth = {
   user: "jamespsteinberg@gmail.com",
   pass: "8iN42haKAYA"
@@ -66,12 +67,14 @@ var groupUrl = 'https://www.linkedin.com/groups/I-am-working-on-trying-4117360.S
 Helper Functions
 **/
 
+// TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var amILoggedIn = function() {
   return this.evaluate(function rock(){
     return document.querySelectorAll('li.nav-item').length > 3;
   });
 } 
 
+// TODO: Accept filename paramater
 var captureScreen = function() {
   this.capture('/vagrant/test.png');
 }
