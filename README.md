@@ -23,8 +23,9 @@ casperjs test.js
 
 ### Network Diagram
 
-                        Dash         Flask         DB          Casper           LinkedIn
 1. Import Discussion
+
+                        Dash         Flask         DB          Casper           LinkedIn
 
                          ------------->
                          POST: /goto_discussion
@@ -65,15 +66,17 @@ casperjs test.js
 
 2. Add Pitch
 
-                   ------------------->
-                   POST: /add_pitch  
-                         Pitch  
-                                      ----------->  
-                                      POST: /store_pitch  
-                                            Pitch  
-                                      <----------  
-                                       True  
+                        Dash         Flask         DB          Casper           LinkedIn
 
-                  <----------------------  
-                   True
+                        ---------------->
+                        POST: /add_pitch  
+                              Pitch  
+                                     --------------->  
+                                     POST: /store_pitch  
+                                           Pitch  
+                                     <---------------  
+                                      True  
+          
+                        <---------------  
+                         True
 
