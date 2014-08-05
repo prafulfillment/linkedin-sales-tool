@@ -43,8 +43,16 @@ casperjs test.js
 2. Create User
 
                         Dash         Flask         DB
-
-
+                       
+                         ------------->
+                           User, pass
+                                      ------------->
+                                        user/ pass
+                                     <-------------  
+                                      True  
+          
+                        <--------------  
+                         True
 
 3. Import Discussion
 
@@ -55,30 +63,30 @@ casperjs test.js
                                User
                                Discussion URL
                                     
-                                    ----------->
-                                    POST: /ask_pass
-                                          User
-                                    <----------
+                                       ----------->
+                                        POST: /ask_pass
+                                              User
+                                       <----------
                                        Pass
 
-                                      -------------------->
+                                       -------------------->
                                        User, Pass
                                        Discussion URL
 
-                                                           ----------------->
-                                                           Login: User,Pass
-                                                           <----------------
-                                                               Homepage
+                                                              ----------------->
+                                                              Login: User,Pass
+                                                              <----------------
+                                                                  Homepage
 
-                                                           ----------------->
-                                                           Goto: Discussion URL
-                                                           <-----------------
-                                                             Discussion page
+                                                              ----------------->
+                                                              Goto: Discussion URL
+                                                              <-----------------
+                                                               Discussion page
 
-                                                           ----------------->
-                                                           Load More: comments
-                                                           <-----------------
-                                                           Additional comments
+                                                              ----------------->
+                                                              Load More: comments
+                                                              <-----------------
+                                                               Additional comments
 
                                        <----------------------
                                          [Listof `comment`s]
