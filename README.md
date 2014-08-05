@@ -29,7 +29,7 @@ casperjs test.js
                                     <----------
                                        Pass
 
-2 Create User
+2. Create User
                         Dash         Flask         DB
 
 
@@ -94,4 +94,3 @@ casperjs test.js
 
 5. Send Pitch
                         Dash         Flask         DB          Casper           LinkedIn
-
