@@ -145,4 +145,5 @@ A Conversation is:
                                       <----------------------------
                                        [Listof `comment`s] 
                                        --------------->
-                                        [listof comments]
+                                        [listof userids],
+                                        pitch
