@@ -39,12 +39,14 @@ A Conversation is:
                         Dash         Flask         DB  
 
                          ------------->
-                           Request
+                         POST: /load_dash
                                       ------------->
-                                        Request
+                                        POST: Request
                                         <-------------
-                                          Users, pitches,
-                                          URLs, # of ppl left per URL
+                                          [Listof Users],
+                                          [Listof pitches],
+                                          URLs, 
+                                         # of ppl left per URL
                           <--------------
                            Users, pitches, URLs, 
                            # of ppl left per URL
@@ -55,9 +57,11 @@ A Conversation is:
                         Dash         Flask         DB
                        
                          ------------->
+                          POST: /add_user
                            User, pass
                                       ------------->
-                                        user/ pass
+                                       ROUTE: 
+                                        User, pass
                                      <-------------  
                                       True  
           
@@ -78,6 +82,7 @@ A Conversation is:
                                        <----------
                                        Pass
                                        -------------------->
+                                       COMMAND LINE: import_disc
                                        User, Pass
                                        Discussion URL
                                                               ----------------->
@@ -98,8 +103,7 @@ A Conversation is:
                                        <----------------------
                                          [Listof `comment`s]
                                        ----------->
-                                       POST: /store_comment
-                                             [Listof `comment`s]
+                                       [Listof `comment`s]
 
 4. Add Pitch
 
