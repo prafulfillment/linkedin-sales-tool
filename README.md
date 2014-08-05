@@ -20,6 +20,16 @@ Run the program with:
 
 casperjs test.js
 
+### Definitions
+
+A Comment is:
+
+
+A Conversation is:
+
+
+
+
 
 ### Network Diagram
 
@@ -61,18 +71,15 @@ casperjs test.js
                          ------------->
                          POST: /goto_discussion
                                User
-                               Discussion URL
-                                    
+                               Discussion URL                 
                                        ----------->
                                         POST: /ask_pass
                                               User
                                        <----------
                                        Pass
-
                                        -------------------->
                                        User, Pass
                                        Discussion URL
-
                                                               ----------------->
                                                               Login: User,Pass
                                                               <----------------
@@ -90,7 +97,6 @@ casperjs test.js
 
                                        <----------------------
                                          [Listof `comment`s]
-
                                        ----------->
                                        POST: /store_comment
                                              [Listof `comment`s]
@@ -107,7 +113,6 @@ casperjs test.js
                                            Pitch  
                                      <-------------  
                                       True  
-          
                         <--------------  
                          True
 
@@ -115,3 +120,29 @@ casperjs test.js
 5. Send Pitch
 
                         Dash         Flask         DB          Casper           LinkedIn
+
+
+                        -------------->
+                        POST: /send_pitch  
+                         Pitch, user, url
+                         # of messages 
+                         to send  
+
+                                     --------------->  
+                                      # of messages to
+                                     send, url
+                                     <--------------
+                                      [Listof userId]
+
+                                     --------------->
+                                        user
+                                     <--------------
+                                       pass
+
+                                     ---------------------------->  
+                                      Pitch, user, pass, url,  
+                                      [Listof userids]
+                                      <----------------------------
+                                       [Listof `comment`s] 
+                                       --------------->
+                                        [listof comments]
