@@ -1,7 +1,7 @@
 var casper = require('casper').create();
 var _ = require('lodash-node');
 var system = require('system');
-var Firebase = require("firebase");
+phantom.page.injectJs( 'https://cdn.firebase.com/js/client/1.0.15/firebase.js');
 
 /**
 ERROR CALLBACKS
@@ -200,7 +200,9 @@ casper.then(function(){
       this.sendKeys('#send-message-body', PITCH_BODY(comment));
       this.then(function(){
 	     // send message
-         //this.click('#send-message-submit');
+         /*if (!comment.isFirstDegree){ // TODO: || inFirebase(comment.id)
+            this.click('#send-message-submit');
+         }*/
          this.capture('/vagrant/message_'+i+'.png');
       });
     });
