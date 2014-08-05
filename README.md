@@ -66,17 +66,17 @@ casperjs test.js
 
 2. Add Pitch
 
-                        Dash         Flask         DB          Casper           LinkedIn
+                        Dash         Flask         DB
 
-                        ---------------->
+                        -------------->
                         POST: /add_pitch  
                               Pitch  
-                                     --------------->  
+                                     ------------->  
                                      POST: /store_pitch  
                                            Pitch  
-                                     <---------------  
+                                     <-------------  
                                       True  
           
-                        <---------------  
+                        <--------------  
                          True
 
