@@ -28,8 +28,16 @@ casperjs test.js
 
                         Dash         Flask         DB  
 
-                                    <----------
-                                       Pass
+                         ------------->
+                           Request
+                                      ------------->
+                                        Request
+                                        <-------------
+                                          Users, pitches,
+                                          URLs, # of ppl left per URL
+                          <--------------
+                           Users, pitches, URLs, 
+                           # of ppl left per URL
 
 
 2. Create User
