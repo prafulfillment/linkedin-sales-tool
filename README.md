@@ -25,6 +25,7 @@ casperjs test.js
 
                         Dash       Flask       DB       Casper       LinkedIn
 1. Import Discussion
+
                          ------------->
                          POST: /goto_discussion
                                User
@@ -63,15 +64,16 @@ casperjs test.js
                                              [Listof `comment`s]
 
 2. Add Pitch
-                   ------------------->
-                   POST: /add_pitch
-                         Pitch
-                                      ----------->
-                                      POST: /store_pitch
-                                            Pitch
-                                      <----------
-                                       True
 
-                  <----------------------
+                   ------------------->
+                   POST: /add_pitch  
+                         Pitch  
+                                      ----------->  
+                                      POST: /store_pitch  
+                                            Pitch  
+                                      <----------  
+                                       True  
+
+                  <----------------------  
                    True
 
