@@ -82,7 +82,7 @@ A Conversation is:
                                        <----------
                                        Pass
                                        -------------------->
-                                       COMMAND LINE: import_disc
+                                       COMMAND LINE: import_discussion
                                        User, Pass
                                        Discussion URL
                                                               ----------------->
@@ -101,7 +101,8 @@ A Conversation is:
                                                                Additional comments
 
                                        <----------------------
-                                         [Listof `comment`s]
+                                       POST: /store_comments
+                                             [Listof `comment`s]
                                        ----------->
                                        [Listof `comment`s]
 
@@ -144,10 +145,14 @@ A Conversation is:
                                        pass
 
                                      ---------------------------->  
-                                      Pitch, user, pass, url,  
-                                      [Listof userids]
+                                      Pitch, 
+                                      User, 
+                                      Pass, 
+                                      Group Id,
+                                      [Listof UserIds]
                                       <----------------------------
-                                       [Listof `comment`s] 
+                                       POST: /store_successful
+                                             [Listof UserIds]
                                        --------------->
                                         [listof userids],
                                         pitch
