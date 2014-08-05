@@ -19,3 +19,59 @@ vagrant box add https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box
 Run the program with:
 
 casperjs test.js
+
+
+### Network Diagram
+
+                        Dash       Flask       DB       Casper       LinkedIn
+1. Import Discussion
+                         ------------->
+                         POST: /goto_discussion
+                               User
+                               Discussion URL
+                                    
+                                    ----------->
+                                    POST: /ask_pass
+                                          User
+                                    <----------
+                                       Pass
+
+                                      -------------------->
+                                       User, Pass
+                                       Discussion URL
+
+                                                           ----------------->
+                                                           Login: User,Pass
+                                                           <----------------
+                                                               Homepage
+
+                                                           ----------------->
+                                                           Goto: Discussion URL
+                                                           <-----------------
+                                                             Discussion page
+
+                                                           ----------------->
+                                                           Load More: comments
+                                                           <-----------------
+                                                           Additional comments
+
+                                       <----------------------
+                                         [Listof `comment`s]
+
+                                       ----------->
+                                       POST: /store_comment
+                                             [Listof `comment`s]
+
+2. Add Pitch
+                   ------------------->
+                   POST: /add_pitch
+                         Pitch
+                                      ----------->
+                                      POST: /store_pitch
+                                            Pitch
+                                      <----------
+                                       True
+
+                  <----------------------
+                   True
+
