@@ -23,7 +23,7 @@ casperjs test.js
 
 ### Network Diagram
 
-                        Dash         Flask             DB          Casper           LinkedIn
+                        Dash         Flask         DB          Casper           LinkedIn
 1. Import Discussion
 
                          ------------->
