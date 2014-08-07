@@ -1,7 +1,12 @@
-var casper = require('casper').create();
+var casper = require('casper').create({
+    pageSettings: {
+        loadImages:  false,        // do not load images
+        loadPlugins: false         // do not load NPAPI plugins (Flash, Silverlight, ...)
+    }
+});
 var _ = require('lodash-node');
 var system = require('system');
-phantom.page.injectJs( 'https://cdn.firebase.com/js/client/1.0.15/firebase.js');
+
 
 /**
 ERROR CALLBACKS
@@ -211,7 +216,6 @@ casper.then(function(){
 
 // Output comment information
 casper.run(function(){
-  var scoreListRef = new Firebase('https://blinding-fire-6559.firebaseio.com//userList');
   this.echo('\n'+comments_count + ' comments captured.');
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
   
@@ -225,13 +229,6 @@ casper.run(function(){
     
     var messageToID = comment.userID;
     var msgUrl = msgPartial + messageToID
-    var userScoreRef = scoreListRef.child(id);
-    userScoreRef.set({name:comment.name, 
-                      id:comment.userID, 
-                      comment:comment.comment, 
-                      url:msgUrl, 
-                      sender:auth.user, 
-                      date:getToday()}); 
   }
   this.exit();
 });
