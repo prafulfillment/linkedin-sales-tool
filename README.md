@@ -178,11 +178,13 @@ A Conversation is:
 
 #Database Diagram
 * smarketers are us
-* discussionThreads are the threads we are pulling from
-* warehousePeople are the people are potential customers found from discussionThreads
 * pitches are the automated pitches we are sending out
+* groups are the linkedIn groups that we joined
+* discussionThreads are the threads from the groups
+* warehousePeople are the people are potential customers found from discussionThreads
+
 
 * conversationStarters are the first message we send out. They send a Pitch from a smarketer to a warehousePeople.
 * replies are messages sent after the initial message of a conversationStarter between a smarketer and a warehousePeople
 
-![Screen Shot 2014-08-07 at 11.44.27 AM.png](https://bitbucket.org/repo/qAbGER/images/2064314133-Screen%20Shot%202014-08-07%20at%2011.44.27%20AM.png)
+![Screen Shot 2014-08-07 at 12.38.56 PM.png](https://bitbucket.org/repo/qAbGER/images/2154469389-Screen%20Shot%202014-08-07%20at%2012.38.56%20PM.png)
