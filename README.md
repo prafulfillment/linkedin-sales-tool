@@ -175,3 +175,6 @@ A Conversation is:
                                       True  
                         <--------------  
                          True
+
+#Database Diagram
+![Screen Shot 2014-08-07 at 11.44.27 AM.png](https://bitbucket.org/repo/qAbGER/images/2064314133-Screen%20Shot%202014-08-07%20at%2011.44.27%20AM.png)
