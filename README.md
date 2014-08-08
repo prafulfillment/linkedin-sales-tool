@@ -83,7 +83,8 @@ A Conversation is:
                                        Pass
                                        -------------------->
                                        COMMAND LINE: import_discussion
-                                       User, Pass
+                                       User
+                                       Pass
                                        Discussion URL
                                                               ----------------->
                                                               Login: User,Pass
@@ -129,9 +130,9 @@ A Conversation is:
 
                         -------------->
                         POST: /send_pitch  
-                         Pitch, user, url
-                         # of messages 
-                         to send  
+                         Pitch
+                         [Listof `User`s]
+                         Group ID
 
                                      --------------->  
                                       # of messages to
