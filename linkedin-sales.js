@@ -65,9 +65,7 @@ Helper Functions
 
 // TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var amILoggedIn = function() {
-  return this.evaluate(function rock(){
-    return document.querySelectorAll('li.nav-item').length > 3;
-  });
+  return !(this.getTitle().indexOf('Sign In') >= 0);
 } 
 
 // TODO: Accept filename paramater
