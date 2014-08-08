@@ -112,6 +112,30 @@ casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', functio
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
 
+// Send pitch to user
+// Side Effect: Will send them a message with given pitch
+var i = 0;
+casper.then(function(){
+  var toUserID = casper.cli.get('to-user-id');
+  var pitchSubject = casper.cli.get('pitch-subject');
+  var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
+  var sendPitch = !!casper.cli.get('send-pitch');
+
+  var groupID = '4117360'
+  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
+  var msgUrl = msgPartial + toUserID;
+
+  this.thenOpen(msgUrl, function(){
+    this.click('#control_gen_7');
+    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
+    //i+=1;
+    //this.capture('/vagrant/message_'+i+'.png');
+  });
+});
+
+casper.then(function(){
+  this.exit();
+});
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
   this.echo('Open group...');
@@ -161,28 +185,6 @@ casper.then(function(){
       comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
       comment['isFirstDegree'] = comment['connection'] == 1;
     });
-  });
-});
-
-// Send pitch to user
-// Side Effect: Will send them a message with given pitch
-// Step 5
-var i = 0;
-casper.then(function(){
-  var toUserID = casper.cli.get('to-user-id');
-  var pitchSubject = casper.cli.get('pitch-subject');
-  var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
-  var sendPitch = !!casper.cli.get('send-pitch');
-
-  var groupID = '4117360'
-  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
-  var msgUrl = msgPartial + toUserID;
-
-  this.thenOpen(msgUrl, function(){
-    this.click('#control_gen_7');
-    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
-    //i+=1;
-    //this.capture('/vagrant/message_'+i+'.png');
   });
 });
 
