@@ -7,7 +7,6 @@ var casper = require('casper').create({
 var _ = require('lodash-node');
 var system = require('system');
 
-
 /**
 ERROR CALLBACKS
 **/
@@ -44,14 +43,6 @@ GLOBAL CONSTANTS
 **/
 // Note: LinkedIn retrieves 6 comments/click
 var LINKEDIN_LOAD_AMOUNT = 6;
-
-// All template fields defiend in `captureComments`
-var PITCH_SUBJECT = _.template('Hello!');
-var PITCH_LINES = ['Hello <%= fname %>,\n', 
-                   'More content here', 
-                   '\nThanks,', 
-                   'Praful']
-var PITCH_BODY = _.template(PITCH_LINES.join('\n'));
 
 /**
 GLOBAL VARIABLES
@@ -132,6 +123,7 @@ Casper Navigation
 **/
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
+// Step 1
 casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', function login() {
   this.echo('Logging In...');
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
@@ -144,6 +136,7 @@ casper.waitFor(amILoggedIn, function(){
 });
 
 // Keep loading all comments until we reach the total
+// Step 2
 casper.then(function(){
   var total = this.evaluate(function(){ 
     return parseInt(document.querySelector('span.count').innerText) 
@@ -169,6 +162,7 @@ casper.then(function(){
 });
 
 // Capture comments from discussion
+// Step 3
 casper.then(function(){
   this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
@@ -181,6 +175,7 @@ casper.then(function(){
 // View their profile & retrieve connection degree info (1st, 2nd, 3rd)
 // Note: -1 means out of network
 // Side Effect: Will show up on their 'People Viewed Your Profile'
+// Step 4
 casper.then(function(){
   this.each(comments, function(self, comment){
     this.thenOpen(profileURL, function(){
@@ -192,25 +187,23 @@ casper.then(function(){
 
 // Capture comments from discussion
 // Side Effect: Will send them a message with given pitch
+// Step 5
+var i = 0;
 casper.then(function(){
-  this.each(comments, function(self, comment){
-    var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
-    var messageToID = comment.userID;
-    var msgUrl = msgPartial + messageToID
-    this.echo('Message URL: ' + msgUrl);
+  var toUserID = casper.cli.get('to-user-id');
+  var pitchSubject = casper.cli.get('pitch-subject');
+  var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
+  var sendPitch = !!casper.cli.get('send-pitch');
 
-    this.thenOpen(msgUrl, function(){
-      this.click('#control_gen_7');
-      this.sendKeys('#send-message-subject', PITCH_SUBJECT(comment));
-      this.sendKeys('#send-message-body', PITCH_BODY(comment));
-      this.then(function(){
-	     // send message
-         /*if (!comment.isFirstDegree){ // TODO: || inFirebase(comment.id)
-            this.click('#send-message-submit');
-         }*/
-         this.capture('/vagrant/message_'+i+'.png');
-      });
-    });
+  var groupID = '4117360'
+  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
+  var msgUrl = msgPartial + toUserID;
+
+  this.thenOpen(msgUrl, function(){
+    this.click('#control_gen_7');
+    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
+    //i+=1;
+    //this.capture('/vagrant/message_'+i+'.png');
   });
 });
 
