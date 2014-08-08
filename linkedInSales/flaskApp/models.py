@@ -32,3 +32,20 @@ class Smarketer(db.Model):
   
   def check_password(self, password):
     return password == aes_decrypt(self.password)
+
+class Group(db.Model):
+  __tablename__ = 'groups'
+  groupID = db.Column(db.Integer, primary_key = True)
+
+  def __init__(self, groupID):
+    self.groupID = groupID
+
+class DiscussionThread(db.Model):
+  __tablename__ = 'discussionThreads'
+  url = db.Column(db.String(255), primary_key = True)
+  groupID = db.Column(db.Integer)
+
+  def __init__(self, url, groupID):
+    self.url = url
+    self.groupID = groupID
+

@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Add a Thread</h2>
+
+  {% for message in form.url.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.groupID.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  <form action="{{ url_for('addDiscussionThread') }}" method=post>
+    {{ form.hidden_tag() }}
+
+    {{ form.groupID.label }}
+    {{ form.groupID }}
+
+    {{ form.url.label }}
+    {{ form.url }}
+
+    {{ form.submit }}
+  </form>
+
+{% endblock %}
