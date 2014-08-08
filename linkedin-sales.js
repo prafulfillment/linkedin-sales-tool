@@ -1,15 +1,21 @@
+/**************************************************
+ *              IMPORT LIBRARIES                  *
+ **************************************************/
+
 var casper = require('casper').create({
     pageSettings: {
         loadImages:  false,        // do not load images
-        loadPlugins: false         // do not load NPAPI plugins (Flash, Silverlight, ...)
+        loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
     }
 });
 var _ = require('lodash-node');
 var system = require('system');
 
-/**
-ERROR CALLBACKS
-**/
+
+/**************************************************
+ *               ERROR CALLBACKS                  *
+ **************************************************/
+
 casper.onConsoleMessage = function(msg) {
     system.stderr.writeLine('console: ' + msg);
 };
@@ -38,9 +44,11 @@ phantom.onError = function(msg, trace) {
     phantom.exit(1);
 };
 
-/**
-GLOBAL CONSTANTS
-**/
+
+/**************************************************
+ *             GLOBAL CONSTANTS                   *
+ **************************************************/
+
 // Note: LinkedIn retrieves 6 comments/click
 var LINKEDIN_LOAD_AMOUNT = 6;
 
@@ -59,9 +67,10 @@ var groupUrl = casper.cli.get('discuss-url');
 console.log("User: " + auth.user);
 console.log("Group URL: " + groupUrl);
 
-/**
-Helper Functions
-**/
+
+/**************************************************
+ *                  HELPERS                       *
+ **************************************************/
 
 // TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var amILoggedIn = function() {
@@ -101,16 +110,26 @@ var moreComments = function() {
   document.getElementById('inline-pagination').click();
 }
 
-/**
-Casper Navigation
-**/
+
+/**************************************************
+ *                    LOGIN                       *
+ **************************************************/
+
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
-// Step 1
 casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', function login() {
   this.echo('Logging In...');
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
+
+// Skip to Import Comments
+casper.thenBypassIf(function(){
+}, 2); 
+
+
+/**************************************************
+ *                    SEND PITCH                  *
+ **************************************************/
 
 // Send pitch to user
 // Side Effect: Will send them a message with given pitch
@@ -136,6 +155,12 @@ casper.then(function(){
 casper.then(function(){
   this.exit();
 });
+
+
+/**************************************************
+ *         IMPORT COMMENTS FROM DISCUSSION        *
+ **************************************************/
+
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
   this.echo('Open group...');
@@ -143,7 +168,6 @@ casper.waitFor(amILoggedIn, function(){
 });
 
 // Keep loading all comments until we reach the total
-// Step 2
 casper.then(function(){
   var total = this.evaluate(function(){ 
     return parseInt(document.querySelector('span.count').innerText) 
@@ -165,7 +189,6 @@ casper.then(function(){
 });
 
 // Capture comments from discussion
-// Step 3
 casper.then(function(){
   this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
@@ -175,10 +198,14 @@ casper.then(function(){
   this.echo('Comments count: ' + comments_count);
 });
 
+
+/**************************************************
+ *    EXTRACT ADDITIONAL USER PROFILE DETAILS     *
+ **************************************************/
+
 // View their profile & retrieve connection degree info (1st, 2nd, 3rd)
 // Note: -1 means out of network
 // Side Effect: Will show up on their 'People Viewed Your Profile'
-// Step 4
 casper.then(function(){
   this.each(comments, function(self, comment){
     this.thenOpen(comment.profileURL, function(){
