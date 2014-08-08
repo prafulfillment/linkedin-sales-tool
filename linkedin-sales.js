@@ -129,18 +129,14 @@ casper.then(function(){
 
   var display = '';
   for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
-     this.waitFor(
-       function(){ 
-          return !this.exists('#inline-pagination.loading'); 
-       },
-       function(){ 
+     this.waitWhileSelector('#inline-pagination.loading', function() {
          if (display != 'none') {
            this.click('#inline-pagination');
            display = this.evaluate(function(){
              return document.getElementById('inline-pagination').style.display;
            });
          }
-       });
+     });
   }
 });
 
