@@ -50,14 +50,14 @@ GLOBAL VARIABLES
 var comments = [];
 var comments_count = 0;
 
-// TODO: Move out of this file
 var auth = {
-  user: "jamespsteinberg@gmail.com",
-  pass: "8iN42haKAYA"
+  user: casper.cli.get('user'),
+  pass: casper.cli.get('pass'),
 };
+var groupUrl = casper.cli.get('discuss-url');
 
-//var groupUrl = 'https://www.linkedin.com/groups/if-you-were-asked-try-4117360.S.5865477729327009793?view=&gid=4117360&type=member&item=5865477729327009793&report%2Esuccess=KFBepuKGen-KgW-5xqS-b-STrCfXRn9x6PnsS7U_hjTXeniek-ssQLCBwAyQhooJ6W9TPod_Yg_vRcMhHLh7GUlDhuiKMcLJCBy6bPU_i5TXeDnNgP8jvaHiY8BvRcLxTvbjbWHihXSnUxGx6-MToLHMrX6nRQneyW9Bbn0Mi09oenXYyB6wQMJkrgK3ee5YyruBdxM11tL%EF%BB%BF'
-var groupUrl = 'https://www.linkedin.com/groups/I-am-working-on-trying-4117360.S.5896995984176590850?qid=6eefc472-190e-48c5-9378-854f8c171ab6&goback=%2Egde_4117360_member_5865477729327009793%2Egmp_4117360'
+console.log("User: " + auth.user);
+console.log("Group URL: " + groupUrl);
 
 /**
 Helper Functions
