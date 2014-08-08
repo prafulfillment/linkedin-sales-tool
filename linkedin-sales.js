@@ -157,14 +157,14 @@ casper.then(function(){
 // Step 4
 casper.then(function(){
   this.each(comments, function(self, comment){
-    this.thenOpen(profileURL, function(){
+    this.thenOpen(comment.profileURL, function(){
       comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
       comment['isFirstDegree'] = comment['connection'] == 1;
     });
   });
 });
 
-// Capture comments from discussion
+// Send pitch to user
 // Side Effect: Will send them a message with given pitch
 // Step 5
 var i = 0;
@@ -186,21 +186,6 @@ casper.then(function(){
   });
 });
 
-// Output comment information
 casper.run(function(){
-  this.echo('\n'+comments_count + ' comments captured.');
-  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
-  
-  for (var i=0; i<comments_count; i++){ 
-    var comment = comments[i];
-    this.echo(comment.name); 
-    this.echo(comment.userID); 
-    this.echo(comment.degree);
-    this.echo(comment.isFirstDegree);
-    this.echo(comment.image_src);
-    
-    var messageToID = comment.userID;
-    var msgUrl = msgPartial + messageToID
-  }
   this.exit();
 });
