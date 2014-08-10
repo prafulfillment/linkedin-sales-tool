@@ -80,11 +80,13 @@ A Conversation is:
                                         POST: /ask_pass
                                               User
                                        <----------
+                                       First Name
                                        Pass
                                        -------------------->
                                        COMMAND LINE: import_discussion
                                        User
                                        Pass
+                                       First Name
                                        Discussion URL
                                                               ----------------->
                                                               Login: User,Pass
@@ -130,8 +132,11 @@ A Conversation is:
 
                         -------------->
                         POST: /send_pitch  
+                         Username
+                         Password
+                         First Name
                          Pitch
-                         [Listof `User`s]
+                         UserID
                          Group ID
 
                                      --------------->  
