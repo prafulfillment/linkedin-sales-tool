@@ -64,10 +64,6 @@ var auth = {
 };
 var groupUrl = casper.cli.get('discuss-url');
 
-console.log("User: " + auth.user);
-console.log("Group URL: " + groupUrl);
-
-
 /**************************************************
  *                  HELPERS                       *
  **************************************************/
@@ -122,8 +118,10 @@ casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', functio
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
 
-// Skip to Import Comments
+
+// Skip Send Pitch
 casper.thenBypassIf(function(){
+    return !casper.cli.has('send-pitch');
 }, 2); 
 
 
@@ -133,22 +131,20 @@ casper.thenBypassIf(function(){
 
 // Send pitch to user
 // Side Effect: Will send them a message with given pitch
-var i = 0;
 casper.then(function(){
   var toUserID = casper.cli.get('to-user-id');
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
   var sendPitch = !!casper.cli.get('send-pitch');
-
   var groupID = '4117360'
+
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
   var msgUrl = msgPartial + toUserID;
 
   this.thenOpen(msgUrl, function(){
     this.click('#control_gen_7');
     this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
-    //i+=1;
-    //this.capture('/vagrant/message_'+i+'.png');
+    this.capture('/vagrant/message_'+toUserId+'.png');
   });
 });
 
@@ -163,7 +159,6 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-  this.echo('Open group...');
   this.open(groupUrl)
 });
 
@@ -172,8 +167,6 @@ casper.then(function(){
   var total = this.evaluate(function(){ 
     return parseInt(document.querySelector('span.count').innerText) 
   });
-
-  this.echo('Total: ' + total);
 
   var display = '';
   for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
@@ -190,12 +183,10 @@ casper.then(function(){
 
 // Capture comments from discussion
 casper.then(function(){
-  this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
   comments = _.uniq(comments, function(comment) { return comment.name; }); 
   comments.splice(10);
   comments_count = comments.length;
-  this.echo('Comments count: ' + comments_count);
 });
 
 
@@ -216,5 +207,6 @@ casper.then(function(){
 });
 
 casper.run(function(){
+  this.echo(JSON.stringify(comments));
   this.exit();
 });
