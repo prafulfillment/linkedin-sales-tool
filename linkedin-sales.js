@@ -1,11 +1,21 @@
-var casper = require('casper').create();
+/**************************************************
+ *              IMPORT LIBRARIES                  *
+ **************************************************/
+
+var casper = require('casper').create({
+    pageSettings: {
+        loadImages:  false,        // do not load images
+        loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
+    }
+});
 var _ = require('lodash-node');
 var system = require('system');
-phantom.page.injectJs( 'https://cdn.firebase.com/js/client/1.0.15/firebase.js');
 
-/**
-ERROR CALLBACKS
-**/
+
+/**************************************************
+ *               ERROR CALLBACKS                  *
+ **************************************************/
+
 casper.onConsoleMessage = function(msg) {
     system.stderr.writeLine('console: ' + msg);
 };
@@ -34,19 +44,13 @@ phantom.onError = function(msg, trace) {
     phantom.exit(1);
 };
 
-/**
-GLOBAL CONSTANTS
-**/
+
+/**************************************************
+ *             GLOBAL CONSTANTS                   *
+ **************************************************/
+
 // Note: LinkedIn retrieves 6 comments/click
 var LINKEDIN_LOAD_AMOUNT = 6;
-
-// All template fields defiend in `captureComments`
-var PITCH_SUBJECT = _.template('Hello!');
-var PITCH_LINES = ['Hello <%= fname %>,\n', 
-                   'More content here', 
-                   '\nThanks,', 
-                   'Praful']
-var PITCH_BODY = _.template(PITCH_LINES.join('\n'));
 
 /**
 GLOBAL VARIABLES
@@ -54,24 +58,19 @@ GLOBAL VARIABLES
 var comments = [];
 var comments_count = 0;
 
-// TODO: Move out of this file
 var auth = {
-  user: "jamespsteinberg@gmail.com",
-  pass: "8iN42haKAYA"
+  user: casper.cli.get('user'),
+  pass: casper.cli.get('pass'),
 };
+var groupUrl = casper.cli.get('discuss-url');
 
-//var groupUrl = 'https://www.linkedin.com/groups/if-you-were-asked-try-4117360.S.5865477729327009793?view=&gid=4117360&type=member&item=5865477729327009793&report%2Esuccess=KFBepuKGen-KgW-5xqS-b-STrCfXRn9x6PnsS7U_hjTXeniek-ssQLCBwAyQhooJ6W9TPod_Yg_vRcMhHLh7GUlDhuiKMcLJCBy6bPU_i5TXeDnNgP8jvaHiY8BvRcLxTvbjbWHihXSnUxGx6-MToLHMrX6nRQneyW9Bbn0Mi09oenXYyB6wQMJkrgK3ee5YyruBdxM11tL%EF%BB%BF'
-var groupUrl = 'https://www.linkedin.com/groups/I-am-working-on-trying-4117360.S.5896995984176590850?qid=6eefc472-190e-48c5-9378-854f8c171ab6&goback=%2Egde_4117360_member_5865477729327009793%2Egmp_4117360'
-
-/**
-Helper Functions
-**/
+/**************************************************
+ *                  HELPERS                       *
+ **************************************************/
 
 // TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var amILoggedIn = function() {
-  return this.evaluate(function rock(){
-    return document.querySelectorAll('li.nav-item').length > 3;
-  });
+  return !(this.getTitle().indexOf('Sign In') >= 0);
 } 
 
 // TODO: Accept filename paramater
@@ -107,24 +106,11 @@ var moreComments = function() {
   document.getElementById('inline-pagination').click();
 }
 
-var getToday = function() {
-    var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
-        var yyyy = today.getFullYear();
-        if(dd<10) {
-          dd='0'+dd
-        } 
-        if(mm<10) {
-        mm='0'+mm
-        } 
-        today = mm+'/'+dd+'/'+yyyy;
-    return today;
-}
 
-/**
-Casper Navigation
-**/
+/**************************************************
+ *                    LOGIN                       *
+ **************************************************/
+
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', function login() {
@@ -132,9 +118,47 @@ casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', functio
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
 
+
+// Skip Send Pitch
+casper.thenBypassIf(function(){
+    return !casper.cli.has('send-pitch');
+}, 2); 
+
+
+/**************************************************
+ *                    SEND PITCH                  *
+ **************************************************/
+
+// Send pitch to user
+// Side Effect: Will send them a message with given pitch
+casper.then(function(){
+  var toUserID = casper.cli.get('to-user-id');
+  var pitchSubject = casper.cli.get('pitch-subject');
+  var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
+  var sendPitch = !!casper.cli.get('send-pitch');
+  var groupID = '4117360'
+
+  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
+  var msgUrl = msgPartial + toUserID;
+
+  this.thenOpen(msgUrl, function(){
+    this.click('#control_gen_7');
+    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
+    this.capture('/vagrant/message_'+toUserId+'.png');
+  });
+});
+
+casper.then(function(){
+  this.exit();
+});
+
+
+/**************************************************
+ *         IMPORT COMMENTS FROM DISCUSSION        *
+ **************************************************/
+
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-  this.echo('Open group...');
   this.open(groupUrl)
 });
 
@@ -144,94 +168,45 @@ casper.then(function(){
     return parseInt(document.querySelector('span.count').innerText) 
   });
 
-  this.echo('Total: ' + total);
-
   var display = '';
   for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
-     this.waitFor(
-       function(){ 
-          return !this.exists('#inline-pagination.loading'); 
-       },
-       function(){ 
+     this.waitWhileSelector('#inline-pagination.loading', function() {
          if (display != 'none') {
            this.click('#inline-pagination');
            display = this.evaluate(function(){
              return document.getElementById('inline-pagination').style.display;
            });
          }
-       });
+     });
   }
 });
 
 // Capture comments from discussion
 casper.then(function(){
-  this.echo('Capturing comments...');
   comments = this.evaluate(captureComments);
   comments = _.uniq(comments, function(comment) { return comment.name; }); 
   comments.splice(10);
   comments_count = comments.length;
-  this.echo('Comments count: ' + comments_count);
 });
+
+
+/**************************************************
+ *    EXTRACT ADDITIONAL USER PROFILE DETAILS     *
+ **************************************************/
 
 // View their profile & retrieve connection degree info (1st, 2nd, 3rd)
 // Note: -1 means out of network
 // Side Effect: Will show up on their 'People Viewed Your Profile'
 casper.then(function(){
   this.each(comments, function(self, comment){
-    this.thenOpen(profileURL, function(){
+    this.thenOpen(comment.profileURL, function(){
       comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
       comment['isFirstDegree'] = comment['connection'] == 1;
     });
   });
 });
 
-// Capture comments from discussion
-// Side Effect: Will send them a message with given pitch
-casper.then(function(){
-  this.each(comments, function(self, comment){
-    var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
-    var messageToID = comment.userID;
-    var msgUrl = msgPartial + messageToID
-    this.echo('Message URL: ' + msgUrl);
-
-    this.thenOpen(msgUrl, function(){
-      this.click('#control_gen_7');
-      this.sendKeys('#send-message-subject', PITCH_SUBJECT(comment));
-      this.sendKeys('#send-message-body', PITCH_BODY(comment));
-      this.then(function(){
-	     // send message
-         /*if (!comment.isFirstDegree){ // TODO: || inFirebase(comment.id)
-            this.click('#send-message-submit');
-         }*/
-         this.capture('/vagrant/message_'+i+'.png');
-      });
-    });
-  });
-});
-
-// Output comment information
 casper.run(function(){
-  var scoreListRef = new Firebase('https://blinding-fire-6559.firebaseio.com//userList');
-  this.echo('\n'+comments_count + ' comments captured.');
-  var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid=4117360&memberID='
-  
-  for (var i=0; i<comments_count; i++){ 
-    var comment = comments[i];
-    this.echo(comment.name); 
-    this.echo(comment.userID); 
-    this.echo(comment.degree);
-    this.echo(comment.isFirstDegree);
-    this.echo(comment.image_src);
-    
-    var messageToID = comment.userID;
-    var msgUrl = msgPartial + messageToID
-    var userScoreRef = scoreListRef.child(id);
-    userScoreRef.set({name:comment.name, 
-                      id:comment.userID, 
-                      comment:comment.comment, 
-                      url:msgUrl, 
-                      sender:auth.user, 
-                      date:getToday()}); 
-  }
+  this.echo(JSON.stringify(comments));
   this.exit();
 });

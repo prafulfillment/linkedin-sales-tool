@@ -97,10 +97,13 @@ A Conversation is:
                                         POST: /ask_pass
                                               User
                                        <----------
+                                       First Name
                                        Pass
                                        -------------------->
                                        COMMAND LINE: import_discussion
-                                       User, Pass
+                                       User
+                                       Pass
+                                       First Name
                                        Discussion URL
                                                               ----------------->
                                                               Login: User,Pass
@@ -146,9 +149,12 @@ A Conversation is:
 
                         -------------->
                         POST: /send_pitch  
-                         Pitch, user, url
-                         # of messages 
-                         to send  
+                         Username
+                         Password
+                         First Name
+                         Pitch
+                         UserID
+                         Group ID
 
                                      --------------->  
                                       # of messages to
