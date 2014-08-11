@@ -116,7 +116,8 @@ var moreComments = function() {
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login', function login() {
-  this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+    this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+    this.capture('/vagrant/login.png');
 });
 
 
@@ -163,8 +164,8 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-  var groupUrl = casper.cli.get('discuss-url');
-  this.open(groupUrl)
+    var groupUrl = casper.cli.get('discuss-url');
+    this.open(groupUrl)
 });
 
 // Keep loading all comments until we reach the total
@@ -172,6 +173,11 @@ casper.then(function(){
     var total = this.evaluate(function(){ 
         return parseInt(document.querySelector('span.count').innerText) 
     });
+
+    // if there's no pagination button, quit
+    if (!this.exists('#inline-pagination')) {
+       return;
+    }
 
     for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
         this.waitWhileSelector('#inline-pagination.loading', function() {
