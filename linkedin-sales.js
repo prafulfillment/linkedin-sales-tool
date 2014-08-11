@@ -62,7 +62,6 @@ var auth = {
   user: casper.cli.get('user'),
   pass: casper.cli.get('pass'),
 };
-var groupUrl = casper.cli.get('discuss-url');
 
 /**************************************************
  *                  HELPERS                       *
@@ -113,8 +112,7 @@ var moreComments = function() {
 
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
-casper.start('https://www.linkedin.com/uas/login?goback=&trk=hb_signin', function login() {
-  this.echo('Logging In...');
+casper.start('https://www.linkedin.com/uas/login', function login() {
   this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
 });
 
@@ -136,7 +134,7 @@ casper.then(function(){
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
   var sendPitch = !!casper.cli.get('send-pitch');
-  var groupID = '4117360'
+  var groupID = casper.cli.get('group-id');
 
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
   var msgUrl = msgPartial + toUserID;
@@ -159,6 +157,7 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
+  var groupUrl = casper.cli.get('discuss-url');
   this.open(groupUrl)
 });
 
@@ -185,7 +184,6 @@ casper.then(function(){
 casper.then(function(){
   comments = this.evaluate(captureComments);
   comments = _.uniq(comments, function(comment) { return comment.name; }); 
-  comments.splice(10);
   comments_count = comments.length;
 });
 
