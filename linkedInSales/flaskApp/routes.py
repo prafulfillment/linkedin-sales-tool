@@ -3,9 +3,11 @@ from flask import render_template, request, flash, session, url_for, redirect
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm
 from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople
-from subprocess import check_output
+import subprocess
+import json
 
 mail = Mail()
+DEBUG = True
 
 @app.route('/')
 def home():
@@ -95,8 +97,21 @@ def addGroup():
         return render_template('addGroup.html', form=form)
 
     elif request.method == 'GET':
-      return render_template('addGroup.html', form=form)  
-  
+      return render_template('addGroup.html', form=form)
+
+@app.route('/sendPitch', methods=['GET', 'POST'])
+def sendPitch():
+    user = Smarketer.query.filter_by(username = session['email']).first()
+    usernameText = "--user='" + user.username + "'"
+    passwordText = "--pass='" + aes_decrypt(user.password) + "'"
+    firstNameText = "--first-name='" + user.firstName + "'"
+    toUserID = ''
+    pitchSubject = ''
+    pitchBody = ''
+    groupID = ''
+    sendPitch = not DEBUG
+    proc = subprocess.Popen("casperjs linkedin-sales.js --user={0} --pass={1} --first-name={3} --to-user-id={3} --pitch-subject={4} --pitch-body={5} --group-id={6} --send-pitch={7}".format(usernameText, passwordText, firstNameText, toUserID, pitchSubject, pitchBody, groupID, sendPitch), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 @app.route('/addDiscussionThread', methods=['GET', 'POST'])
 def addDiscussionThread():
 
