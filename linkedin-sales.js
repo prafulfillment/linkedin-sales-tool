@@ -166,21 +166,14 @@ casper.waitFor(amILoggedIn, function(){
 
 // Keep loading all comments until we reach the total
 casper.then(function(){
-  var total = this.evaluate(function(){ 
-    return parseInt(document.querySelector('span.count').innerText) 
-  });
+    var total = this.evaluate(function(){ 
+        return parseInt(document.querySelector('span.count').innerText) 
+    });
 
-  var display = '';
-  for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
-     this.waitWhileSelector('#inline-pagination.loading', function() {
-         if (display != 'none') {
-           this.click('#inline-pagination');
-           display = this.evaluate(function(){
-             return document.getElementById('inline-pagination').style.display;
-           });
-         }
-     });
-  }
+    for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
+        this.waitWhileSelector('#inline-pagination.loading', function() {
+            this.click('#inline-pagination');
+        })}
 });
 
 // Capture comments from discussion
