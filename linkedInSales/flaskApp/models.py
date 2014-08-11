@@ -51,3 +51,28 @@ class DiscussionThread(db.Model):
   def __init__(self, url, groupID):
     self.url = url
     self.groupID = groupID
+
+class WarehousePeople(db.Model):
+  __tablename__ = 'warehousePeople'  
+  warehousePeopleID = db.Column(db.Integer, primary_key = True)
+  userID = db.Column(db.Integer)
+  firstName = db.Column(db.String(255))
+  lastName = db.Column(db.String(255))
+  byline = db.Column(db.String(255))
+  discussionURL = db.Column(db.String(767))
+  comment = db.Column(db.Text)
+  likesCount = db.Column(db.Integer)
+  profileURL = db.Column(db.String(255))
+  imageURL = db.Column(db.String(255))
+
+  def __init__(self, userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL):
+    self.userID = userID
+    self.firstName = firstName
+    self.lastName = lastName
+    self.byline = byline
+    self.discussionURL = discussionURL
+    self.comment = comment
+    self.likesCount = likesCount
+    self.profileURL = profileURL
+    self.imageURL = imageURL
+

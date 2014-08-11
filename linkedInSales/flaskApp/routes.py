@@ -2,7 +2,7 @@ from flaskApp import app
 from flask import render_template, request, flash, session, url_for, redirect
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm
 from flask.ext.mail import Message, Mail
-from models import db, Smarketer, Group, DiscussionThread, aes_decrypt
+from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople
 from subprocess import check_output
 
 mail = Mail()
@@ -123,7 +123,7 @@ def addDiscussionThread():
         discussionURLText = "--discussion-url='" + form.url.data + "'"
         out = check_output(["casperjs", "linkedin-sales.js", usernameText, passwordText, firstNameText, discussionURLText])
 
-	#TODO subprocess.open()
+	#TODO subprocess.open() loop through all of them here
 	userID = user.userID
 	firstName = "get firstname from casper"
 	lastName = "get lastname from casper"
@@ -133,7 +133,8 @@ def addDiscussionThread():
 	likesCount = "get likesCount from casper"
 	profileURL = "get profile URL from capser"
 	imageURL = "get imageURL from casper"
-
+	
+	#saves new warehousePerson to database
 	newWarehousePerson = warehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
         db.session.add(newuser)
         db.session.commit()	
