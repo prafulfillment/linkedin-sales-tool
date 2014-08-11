@@ -141,7 +141,14 @@ def addDiscussionThread():
         discussionURLText = "--discuss-url='" + form.url.data + "'"
         proc = subprocess.Popen("casperjs /vagrant/linkedInSales/flaskapp/linkedin-sales.js {0} {1} {2} {3}".format(usernameText, passwordText, firstNameText, discussionURLText), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = proc.communicate()
-        comments = json.loads(output[0])
+        try:
+            comments = json.loads(output[0])
+        except:
+            comments = output[0]
+            err = 'CasperJS timed out'
+            print err
+            response = jsonify(err)
+            return response
 
         for c in comments:
             userID = c["userID"]
