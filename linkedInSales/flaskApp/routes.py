@@ -43,8 +43,8 @@ def signup():
   form = SignupForm()
 
   if 'email' in session:
-    return redirect(url_for('profile')) 
-  
+    return redirect(url_for('profile'))
+
   if request.method == 'POST':
     if form.validate() == False:
       return render_template('signup.html', form=form)
@@ -52,10 +52,10 @@ def signup():
       newuser = Smarketer(form.firstName.data, form.username.data, form.password.data)
       db.session.add(newuser)
       db.session.commit()
-      
+
       session['email'] = newuser.username
       return redirect(url_for('profile'))
-  
+
   elif request.method == 'GET':
     return render_template('signup.html', form=form)
 
@@ -74,7 +74,7 @@ def profile():
 
 @app.route('/addGroup', methods=['GET', 'POST'])
 def addGroup():
-  
+
   if 'email' not in session:
     return redirect(url_for('signin'))
 
@@ -84,7 +84,7 @@ def addGroup():
     return redirect(url_for('signin'))
   else:
     form = GroupForm()
-    
+
     if request.method == 'POST':
       if form.validate() == False:
         return render_template('addGroup.html', form=form)
@@ -92,7 +92,7 @@ def addGroup():
         newGroup = Group(form.groupID.data)
         db.session.add(newGroup)
         db.session.commit()
-       
+
         form.groupID.data = ""
         return render_template('addGroup.html', form=form)
 
@@ -168,21 +168,21 @@ def addDiscussionThread():
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)
-  
+
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
   form = SigninForm()
 
   if 'email' in session:
-    return redirect(url_for('profile')) 
-      
+    return redirect(url_for('profile'))
+
   if request.method == 'POST':
     if form.validate() == False:
       return render_template('signin.html', form=form)
     else:
       session['email'] = form.username.data
       return redirect(url_for('profile'))
-                
+
   elif request.method == 'GET':
     return render_template('signin.html', form=form)
 
@@ -191,6 +191,6 @@ def signout():
 
   if 'email' not in session:
     return redirect(url_for('signin'))
-    
+
   session.pop('email', None)
   return redirect(url_for('home'))
