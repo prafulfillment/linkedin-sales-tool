@@ -3,7 +3,8 @@ from flask import render_template, request, flash, session, url_for, redirect
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm
 from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople
-from subprocess import check_output
+import subprocess
+import json
 
 mail = Mail()
 
@@ -41,8 +42,8 @@ def signup():
   form = SignupForm()
 
   if 'email' in session:
-    return redirect(url_for('profile')) 
-  
+    return redirect(url_for('profile'))
+
   if request.method == 'POST':
     if form.validate() == False:
       return render_template('signup.html', form=form)
@@ -50,10 +51,10 @@ def signup():
       newuser = Smarketer(form.firstName.data, form.username.data, form.password.data)
       db.session.add(newuser)
       db.session.commit()
-      
+
       session['email'] = newuser.username
       return redirect(url_for('profile'))
-  
+
   elif request.method == 'GET':
     return render_template('signup.html', form=form)
 
@@ -72,7 +73,7 @@ def profile():
 
 @app.route('/addGroup', methods=['GET', 'POST'])
 def addGroup():
-  
+
   if 'email' not in session:
     return redirect(url_for('signin'))
 
@@ -82,7 +83,7 @@ def addGroup():
     return redirect(url_for('signin'))
   else:
     form = GroupForm()
-    
+
     if request.method == 'POST':
       if form.validate() == False:
         return render_template('addGroup.html', form=form)
@@ -90,13 +91,27 @@ def addGroup():
         newGroup = Group(form.groupID.data)
         db.session.add(newGroup)
         db.session.commit()
-       
+
         form.groupID.data = ""
         return render_template('addGroup.html', form=form)
 
     elif request.method == 'GET':
-      return render_template('addGroup.html', form=form)  
-  
+      return render_template('addGroup.html', form=form)
+
+@app.route('/sendPitch', methods=['POST'])
+def sendPitch():
+    # TODO: Create a form for the remaining fields
+    user = Smarketer.query.filter_by(username = session['email']).first()
+    usernameText = "--user='" + user.username + "'"
+    passwordText = "--pass='" + aes_decrypt(user.password) + "'"
+    firstNameText = "--first-name='" + user.firstName + "'"
+    toUserID = ''
+    pitchSubject = ''
+    pitchBody = ''
+    groupID = ''
+    sendPitch = not DEBUG
+    proc = subprocess.Popen("casperjs linkedin-sales.js --user={0} --pass={1} --first-name={3} --to-user-id={3} --pitch-subject={4} --pitch-body={5} --group-id={6} --send-pitch={7}".format(usernameText, passwordText, firstNameText, toUserID, pitchSubject, pitchBody, groupID, sendPitch), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
 @app.route('/addDiscussionThread', methods=['GET', 'POST'])
 def addDiscussionThread():
 
@@ -115,33 +130,45 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-	#TODO throws error somehow, when it hits casper?
-	# test with group id 4117360 and url https://www.linkedin.com/groups/Safety-productivity-accuracy-please-rank-4117360.S.5828896882205683713?view=&item=5828896882205683713&type=member&gid=4117360&trk=eml-b2_anet_digest-group_discussions-14-grouppost-disc-2&midToken=AQFwAv_iTaBQJA&fromEmail=fromEmail&ut=26E3RCSJJaHSk1
-        usernameText = "--username='" + user.username + "'"
-        passwordText = "--password='" + aes_decrypt(user.password) + "'"
-        firstNameText = "--first-name='" + user.firstName + "'"
-        discussionURLText = "--discussion-url='" + form.url.data + "'"
-        out = check_output(["casperjs", "linkedin-sales.js", usernameText, passwordText, firstNameText, discussionURLText])
-
-	#TODO subprocess.open() loop through all of them here
-	userID = user.userID
-	firstName = "get firstname from casper"
-	lastName = "get lastname from casper"
-	byline = "get byline form casper"
-	discussionURL = form.url.data
-	comment = "get comment from casper"
-	likesCount = "get likesCount from casper"
-	profileURL = "get profile URL from capser"
-	imageURL = "get imageURL from casper"
-	
-	#saves new warehousePerson to database
-	newWarehousePerson = warehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
-        db.session.add(newuser)
-        db.session.commit()	
-
-	#saves new discussionThread in database
+        #saves new discussionThread in database
         newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
         db.session.add(newDiscussionThread)
+        db.session.commit()
+	
+	usernameText = "--user='" + user.username + "'"
+        passwordText = "--pass='" + aes_decrypt(user.password) + "'"
+        firstNameText = "--first-name='" + user.firstName + "'"
+        discussionURLText = "--discuss-url='" + form.url.data + "'"
+        proc = subprocess.Popen("casperjs /vagrant/linkedInSales/flaskapp/linkedin-sales.js {0} {1} {2} {3}".format(usernameText, passwordText, firstNameText, discussionURLText), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output = proc.communicate()
+        try:
+            comments = json.loads(output[0])
+        except:
+            comments = output[0]
+            err = 'CasperJS timed out'
+            print err
+            response = jsonify(err)
+            return response
+
+        for c in comments:
+            userID = c["userID"]
+            name = c["name"]
+            firstName = c["fname"]
+            lastName = c["lname"]
+            byline = c["byline"]
+            userID = c["userID"]
+            discussionURL = form.url.data
+            likesCount = c["likes"]
+            profileURL = c["profileURL"]
+            isFirstDegree = c["isFirstDegree"]
+            connection = c["connection"]
+            imageURL = c["image_src"]
+            comment = c["comment"]
+
+            #saves new warehousePerson to database
+            newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+            db.session.add(newWarehousePerson)
+    
         db.session.commit()
 
         form.url.data = ""
@@ -149,21 +176,21 @@ def addDiscussionThread():
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)
-  
+
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
   form = SigninForm()
 
   if 'email' in session:
-    return redirect(url_for('profile')) 
-      
+    return redirect(url_for('profile'))
+
   if request.method == 'POST':
     if form.validate() == False:
       return render_template('signin.html', form=form)
     else:
       session['email'] = form.username.data
       return redirect(url_for('profile'))
-                
+
   elif request.method == 'GET':
     return render_template('signin.html', form=form)
 
@@ -172,6 +199,6 @@ def signout():
 
   if 'email' not in session:
     return redirect(url_for('signin'))
-    
+
   session.pop('email', None)
   return redirect(url_for('home'))

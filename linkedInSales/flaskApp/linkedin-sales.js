@@ -3,12 +3,9 @@
  **************************************************/
 
 var casper = require('casper').create({
-<<<<<<< HEAD
     //logLevel: "debug",
     //verbose: true,
     waitTimeout: 30000,
-=======
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
     pageSettings: {
         loadImages:  false,        // do not load images
         loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
@@ -68,7 +65,6 @@ var auth = {
   user: casper.cli.get('user'),
   pass: casper.cli.get('pass'),
 };
-var groupUrl = casper.cli.get('discuss-url');
 
 /**************************************************
  *                  HELPERS                       *
@@ -120,7 +116,8 @@ var moreComments = function() {
 // Login to LinkedIn
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login', function login() {
-  this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+    this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+    this.capture('/vagrant/login.png');
 });
 
 
@@ -135,38 +132,24 @@ casper.thenBypassIf(function(){
  **************************************************/
 
 // Send pitch to user
-<<<<<<< HEAD
 // Side Effect: Will send `toUserID` a message with given pitch
 casper.waitFor(amILoggedIn, function(){
-=======
-// Side Effect: Will send them a message with given pitch
-casper.then(function(){
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
   var toUserID = casper.cli.get('to-user-id');
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
   var sendPitch = !!casper.cli.get('send-pitch');
-<<<<<<< HEAD
   var groupID = casper.cli.get('group-id');
-=======
-  var groupID = '4117360'
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
 
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
   var msgUrl = msgPartial + toUserID;
 
   this.thenOpen(msgUrl, function(){
     this.click('#control_gen_7');
-<<<<<<< HEAD
     this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, sendPitch);
     if (!sendPitch) {
         this.capture('/vagrant/message_'+toUserID+'.png');
     }
     this.echo(JSON.stringify({'sent': sendPitch, 'to': toUserID}));
-=======
-    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
-    this.capture('/vagrant/message_'+toUserId+'.png');
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
   });
 });
 
@@ -181,11 +164,8 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-<<<<<<< HEAD
-  var groupUrl = casper.cli.get('discuss-url');
-=======
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
-  this.open(groupUrl)
+    var groupUrl = casper.cli.get('discuss-url');
+    this.open(groupUrl)
 });
 
 // Keep loading all comments until we reach the total
@@ -194,24 +174,15 @@ casper.then(function(){
         return parseInt(document.querySelector('span.count').innerText) 
     });
 
-<<<<<<< HEAD
+    // if there's no pagination button, quit
+    if (!this.exists('#inline-pagination')) {
+       return;
+    }
+
     for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
         this.waitWhileSelector('#inline-pagination.loading', function() {
             this.click('#inline-pagination');
         })}
-=======
-  var display = '';
-  for (var i=0; i<(total/LINKEDIN_LOAD_AMOUNT); i++) {
-     this.waitWhileSelector('#inline-pagination.loading', function() {
-         if (display != 'none') {
-           this.click('#inline-pagination');
-           display = this.evaluate(function(){
-             return document.getElementById('inline-pagination').style.display;
-           });
-         }
-     });
-  }
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
 });
 
 // Capture comments from discussion
