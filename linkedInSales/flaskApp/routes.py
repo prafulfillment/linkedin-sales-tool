@@ -7,7 +7,6 @@ import subprocess
 import json
 
 mail = Mail()
-DEBUG = True
 
 @app.route('/')
 def home():
@@ -131,7 +130,12 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-        usernameText = "--user='" + user.username + "'"
+        #saves new discussionThread in database
+        newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
+        db.session.add(newDiscussionThread)
+        db.session.commit()
+	
+	usernameText = "--user='" + user.username + "'"
         passwordText = "--pass='" + aes_decrypt(user.password) + "'"
         firstNameText = "--first-name='" + user.firstName + "'"
         discussionURLText = "--discuss-url='" + form.url.data + "'"
@@ -157,12 +161,8 @@ def addDiscussionThread():
             #saves new warehousePerson to database
             newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
             db.session.add(newWarehousePerson)
-            db.session.commit()
-
-            #saves new discussionThread in database
-            newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
-            db.session.add(newDiscussionThread)
-            db.session.commit()
+    
+        db.session.commit()
 
         form.url.data = ""
         return render_template('addDiscussionThread.html', form=form)
