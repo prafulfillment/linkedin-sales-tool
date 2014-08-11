@@ -99,8 +99,9 @@ def addGroup():
     elif request.method == 'GET':
       return render_template('addGroup.html', form=form)
 
-@app.route('/sendPitch', methods=['GET', 'POST'])
+@app.route('/sendPitch', methods=['POST'])
 def sendPitch():
+    # TODO: Create a form for the remaining fields
     user = Smarketer.query.filter_by(username = session['email']).first()
     usernameText = "--user='" + user.username + "'"
     passwordText = "--pass='" + aes_decrypt(user.password) + "'"
