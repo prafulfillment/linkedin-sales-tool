@@ -115,34 +115,38 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-	#TODO throws error somehow, when it hits casper?
-	# test with group id 4117360 and url https://www.linkedin.com/groups/Safety-productivity-accuracy-please-rank-4117360.S.5828896882205683713?view=&item=5828896882205683713&type=member&gid=4117360&trk=eml-b2_anet_digest-group_discussions-14-grouppost-disc-2&midToken=AQFwAv_iTaBQJA&fromEmail=fromEmail&ut=26E3RCSJJaHSk1
-        usernameText = "--username='" + user.username + "'"
-        passwordText = "--password='" + aes_decrypt(user.password) + "'"
+        usernameText = "--user='" + user.username + "'"
+        passwordText = "--pass='" + aes_decrypt(user.password) + "'"
         firstNameText = "--first-name='" + user.firstName + "'"
-        discussionURLText = "--discussion-url='" + form.url.data + "'"
-        out = check_output(["casperjs", "linkedin-sales.js", usernameText, passwordText, firstNameText, discussionURLText])
+        discussionURLText = "--discuss-url='" + form.url.data + "'"
+        proc = subprocess.Popen("casperjs /vagrant/linkedInSales/flaskapp/linkedin-sales.js {0} {1} {2} {3}".format(usernameText, passwordText, firstNameText, discussionURLText), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output = proc.communicate()
+        comments = json.loads(output[0])
 
-	#TODO subprocess.open() loop through all of them here
-	userID = user.userID
-	firstName = "get firstname from casper"
-	lastName = "get lastname from casper"
-	byline = "get byline form casper"
-	discussionURL = form.url.data
-	comment = "get comment from casper"
-	likesCount = "get likesCount from casper"
-	profileURL = "get profile URL from capser"
-	imageURL = "get imageURL from casper"
-	
-	#saves new warehousePerson to database
-	newWarehousePerson = warehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
-        db.session.add(newuser)
-        db.session.commit()	
+        for c in comments:
+            userID = c["userID"]
+            name = c["name"]
+            firstName = c["fname"]
+            lastName = c["lname"]
+            byline = c["byline"]
+            userID = c["userID"]
+            discussionURL = form.url.data
+            likesCount = c["likes"]
+            profileURL = c["profileURL"]
+            isFirstDegree = c["isFirstDegree"]
+            connection = c["connection"]
+            imageURL = c["image_src"]
+            comment = c["comment"]
 
-	#saves new discussionThread in database
-        newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
-        db.session.add(newDiscussionThread)
-        db.session.commit()
+            #saves new warehousePerson to database
+            newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+            db.session.add(newWarehousePerson)
+            db.session.commit()
+
+            #saves new discussionThread in database
+            newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
+            db.session.add(newDiscussionThread)
+            db.session.commit()
 
         form.url.data = ""
         return render_template('addDiscussionThread.html', form=form)
