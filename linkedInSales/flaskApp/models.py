@@ -40,12 +40,14 @@ class Group(db.Model):
   def __init__(self, groupID):
     self.groupID = groupID
 
+  def __str__(self):
+    return str(self.groupID)
+
 class DiscussionThread(db.Model):
   __tablename__ = 'discussionThreads'
-  url = db.Column(db.String(255), primary_key = True)
+  url = db.Column(db.String(767), primary_key = True)
   groupID = db.Column(db.Integer)
 
   def __init__(self, url, groupID):
     self.url = url
     self.groupID = groupID
-

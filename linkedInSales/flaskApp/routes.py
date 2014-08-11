@@ -2,7 +2,8 @@ from flaskApp import app
 from flask import render_template, request, flash, session, url_for, redirect
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm
 from flask.ext.mail import Message, Mail
-from models import db, Smarketer, Group, DiscussionThread
+from models import db, Smarketer, Group, DiscussionThread, aes_decrypt
+from subprocess import check_output
 
 mail = Mail()
 
@@ -89,7 +90,7 @@ def addGroup():
         newGroup = Group(form.groupID.data)
         db.session.add(newGroup)
         db.session.commit()
-        
+       
         form.groupID.data = ""
         return render_template('addGroup.html', form=form)
 
@@ -112,7 +113,19 @@ def addDiscussionThread():
     if request.method == 'POST':
       if form.validate() == False:
         return render_template('addDiscussionThread.html', form=form)
+
       else:
+	#TODO throws error somehow, when it hits casper?
+	# test with group id 4117360 and url https://www.linkedin.com/groups/Safety-productivity-accuracy-please-rank-4117360.S.5828896882205683713?view=&item=5828896882205683713&type=member&gid=4117360&trk=eml-b2_anet_digest-group_discussions-14-grouppost-disc-2&midToken=AQFwAv_iTaBQJA&fromEmail=fromEmail&ut=26E3RCSJJaHSk1
+        usernameText = "--username='" + user.username + "'"
+        passwordText = "--password='" + aes_decrypt(user.password) + "'"
+        firstNameText = "--first-name='" + user.firstName + "'"
+        discussionURLText = "--discussion-url='" + form.url.data + "'"
+        out = check_output(["casperjs", "linkedin-sales.js", usernameText, passwordText, firstNameText, discussionURLText])
+
+	#TODO subprocess.open()
+
+	#saves new discussionThread in database
         newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
         db.session.add(newDiscussionThread)
         db.session.commit()
