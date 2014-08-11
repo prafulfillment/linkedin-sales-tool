@@ -33,7 +33,7 @@ class DiscussionThreadForm(Form):
     Form.__init__(self, *args, **kwargs)
 
   def populateForm():
-    return Group.query.filter_by(groupID = 0)
+    return Group.query.all()
 
   url = TextField("url",  [validators.Required("Please enter the url")]) 
   submit = SubmitField("Add a discussion thread")
@@ -47,10 +47,8 @@ class DiscussionThreadForm(Form):
     if discussionThreadExists:
       self.url.errors.append("That thread has already been added")
       return False
-    else:
-      return True
 
-    groupIDExists = DiscussionThread.query.filter_by(groupID = self.groupID.data).first()
+    groupIDExists = Group.query.filter_by(groupID = self.groupID.data).first()
     if groupIDExists:
       return True
     else:
