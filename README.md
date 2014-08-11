@@ -52,23 +52,40 @@ A Conversation is:
                            # of ppl left per URL
 
 
-2. Create User
+2. Create Smarketer
 
                         Dash         Flask         DB
                        
                          ------------->
                           POST: /add_user
-                           User, pass
+                           username, password, firstName
                                       ------------->
                                        ROUTE: 
-                                        User, pass
+                                        username, password, firstName
                                      <-------------  
                                       True  
           
                         <--------------  
                          True
 
-3. Import Discussion
+
+3. Create Group
+
+                        Dash         Flask         DB
+                       
+                         ------------->
+                          POST: /add_group
+                           groupID
+                                      ------------->
+                                       ROUTE: 
+                                        groupID
+                                     <-------------  
+                                      True  
+          
+                        <--------------  
+                         True
+
+4. Create DiscussionThread
 
                         Dash         Flask         DB          Casper           LinkedIn
 
@@ -109,7 +126,7 @@ A Conversation is:
                                        ----------->
                                        [Listof `comment`s]
 
-4. Add Pitch
+5. Create Pitch
 
                         Dash         Flask         DB
 
@@ -125,7 +142,7 @@ A Conversation is:
                          True
 
 
-5. Send Pitch
+6. Send Pitch
 
                         Dash         Flask         DB          Casper           LinkedIn
 
@@ -163,7 +180,7 @@ A Conversation is:
                                         [listof userids],
                                         pitch
 
-5. Add Reply
+7. Create Reply
 
                         Dash         Flask         DB
 
@@ -181,3 +198,19 @@ A Conversation is:
                                       True  
                         <--------------  
                          True
+<<<<<<< HEAD
+=======
+
+#Database Diagram
+* smarketers are us
+* pitches are the automated pitches we are sending out
+* groups are the linkedIn groups that we joined
+* discussionThreads are the threads from the groups
+* warehousePeople are the people are potential customers found from discussionThreads
+
+
+* conversationStarters are the first message we send out. They send a Pitch from a smarketer to a warehousePeople.
+* replies are messages sent after the initial message of a conversationStarter between a smarketer and a warehousePeople
+
+![Screen Shot 2014-08-07 at 12.38.56 PM.png](https://bitbucket.org/repo/qAbGER/images/2154469389-Screen%20Shot%202014-08-07%20at%2012.38.56%20PM.png)
+>>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
