@@ -124,6 +124,19 @@ def addDiscussionThread():
         out = check_output(["casperjs", "linkedin-sales.js", usernameText, passwordText, firstNameText, discussionURLText])
 
 	#TODO subprocess.open()
+	userID = user.userID
+	firstName = "get firstname from casper"
+	lastName = "get lastname from casper"
+	byline = "get byline form casper"
+	discussionURL = form.url.data
+	comment = "get comment from casper"
+	likesCount = "get likesCount from casper"
+	profileURL = "get profile URL from capser"
+	imageURL = "get imageURL from casper"
+
+	newWarehousePerson = warehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+        db.session.add(newuser)
+        db.session.commit()	
 
 	#saves new discussionThread in database
         newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
