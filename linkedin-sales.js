@@ -128,8 +128,8 @@ casper.thenBypassIf(function(){
  **************************************************/
 
 // Send pitch to user
-// Side Effect: Will send them a message with given pitch
-casper.then(function(){
+// Side Effect: Will send `toUserID` a message with given pitch
+casper.waitFor(amILoggedIn, function(){
   var toUserID = casper.cli.get('to-user-id');
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
@@ -141,8 +141,11 @@ casper.then(function(){
 
   this.thenOpen(msgUrl, function(){
     this.click('#control_gen_7');
-    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, false);
-    this.capture('/vagrant/message_'+toUserId+'.png');
+    this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, sendPitch);
+    if (!sendPitch) {
+        this.capture('/vagrant/message_'+toUserID+'.png');
+    }
+    this.echo(JSON.stringify({'sent': sendPitch, 'to': toUserID}));
   });
 });
 
