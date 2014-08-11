@@ -3,6 +3,9 @@
  **************************************************/
 
 var casper = require('casper').create({
+    //logLevel: "debug",
+    //verbose: true,
+    waitTimeout: 30000,
     pageSettings: {
         loadImages:  false,        // do not load images
         loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
