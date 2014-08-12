@@ -88,6 +88,7 @@ var comments_count = 0;
 var auth = {
   user: casper.cli.get('user'),
   pass: casper.cli.get('pass'),
+  name: casper.cli.get('first-name'),
 };
 
 
@@ -95,7 +96,6 @@ var auth = {
  *                  HELPERS                       *
  **************************************************/
 
-// TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var check_login = 1;
 var amILoggedIn = function() {
     this.capture(BASE_DIR + '/logging-in'+check_login+'.png');
@@ -144,15 +144,34 @@ var moreComments = function() {
  *                    LOGIN                       *
  **************************************************/
 
-// Login to LinkedIn
-// TODO: Stay logged in via session & cookie management
-casper.start('https://www.linkedin.com/uas/login', function login() {
-    this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
-    this.capture('static/img/login.png');
+// Load up our cookies
+/*
+var file = auth.name+"-cookies.txt";
+if (fs.exists(file)) {
+    var data = fs.read(file)
+    phantom.cookies = JSON.parse(data)
+}
+*/
+
+// Skip login if our cookies are good
+casper.start('https://www.linkedin.com/', function() {
+    //console.log(data);
+    DEBUG && this.capture(BASE_DIR + '/linkedin.png');
+});
+
+// Test if we're already logged in
+casper.thenBypassIf(amILoggedIn, 2);
+
+// Login if cookies are expired or missing
+// thenOpen counts as 2 steps
+casper.thenOpen('https://www.linkedin.com/uas/login', function(){
+        this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+        DEBUG && this.capture(BASE_DIR + '/login.png');
 });
 
 
-// Skip Send Pitch
+// Send Pitch and Import Discussion are two separate steps
+// We only check for Send Pitch, we'll need more checks as we add steps
 casper.thenBypassIf(function(){
     return !casper.cli.has('send-pitch');
 }, 2); 
