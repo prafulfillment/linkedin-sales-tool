@@ -2,7 +2,7 @@ from flaskApp import app
 from flask import render_template, request, flash, session, url_for, redirect, jsonify
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm, PitchForm
 from flask.ext.mail import Message, Mail
-from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch
+from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch, ConversationStarters, Replies
 import subprocess
 import json
 
@@ -179,7 +179,7 @@ def addDiscussionThread():
             err = 'CasperJS timed out'
             print err
             response = jsonify(msg=err)
-            return response
+            return render_template('addDiscussionThread.html', isError=True, error=response, form=form)
 
         for c in comments:
             userID = c["userID"]
@@ -208,8 +208,6 @@ def addDiscussionThread():
 
 	if savedDiscussionThread:
 	  return render_template('addDiscussionThread.html', success=savedDiscussionThread)
-	else:
-	  return render_template('addDiscussionThread.html', success=savedDiscussionThread, form=form)
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)

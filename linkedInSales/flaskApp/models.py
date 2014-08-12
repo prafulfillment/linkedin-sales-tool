@@ -15,6 +15,23 @@ def aes_decrypt(data):
 
 db = SQLAlchemy()
 
+class ConversationStarters(db.Model):
+  __tablename__ = 'conversationStarters'
+  warehousePeopleID = db.Column(db.Integer, primary_key = True)
+  smarketerPitched = db.Column(db.Integer)
+  pitchID = db.Column(db.Integer)
+  dateSent = db.Column(db.Date)
+  connectionDistance = db.Column(db.Integer)
+  isFirstDegree = db.Column(db.Boolean)
+  isReplied = db.Column(db.Boolean)
+
+  def __init__(self, smarketerPitched, pitchID, connectionDistance, isFirstDegree, isReplied):
+    self.smarketerPitched = smarketerPitched
+    self.pitchID = pitchID
+    self.connectionDistance = connectionDistance
+    self.isFirstDegree = isFirstDegree
+    self.isReplied = isReplied
+
 class Smarketer(db.Model):
   __tablename__ = 'smarketers'
   userID = db.Column(db.Integer, primary_key = True)
