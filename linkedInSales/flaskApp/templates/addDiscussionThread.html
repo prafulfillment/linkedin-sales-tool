@@ -3,6 +3,12 @@
 {% block content %}
   <h2>Add a Thread</h2>
 
+  {% if success %}
+    <div class="flash">Discussion added successfully</div>
+  {% elif success == false %}
+    <div class="flash">Discussion error, is the url correct?</div>
+  {% endif %}
+
   {% for message in form.url.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
@@ -16,6 +22,9 @@
 
     {{ form.groupID.label }}
     {{ form.groupID }}
+
+    {{ form.title.label }}
+    {{ form.title }}
 
     {{ form.url.label }}
     {{ form.url }}

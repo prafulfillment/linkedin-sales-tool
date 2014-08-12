@@ -3,6 +3,10 @@
 {% block content %}
   <h2>Add a Group</h2>
 
+  {% if success %}
+    <div class="flash">Group added successfully</div>
+  {% endif %}
+
   {% for message in form.groupID.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
@@ -12,6 +16,9 @@
 
     {{ form.groupID.label }}
     {{ form.groupID }}
+
+    {{ form.title.label }}
+    {{ form.title }}
 
     {{ form.submit }}
   </form>

@@ -7,8 +7,8 @@ var casper = require('casper').create({
     //verbose: true,
     waitTimeout: 30000,
     pageSettings: {
-        loadImages:  false,        // do not load images
-        loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
+        loadImages:  true,        // do not load images
+        loadPlugins: true         // do not load NPAPI plugins (e.g. Flash)
     }
 });
 var _ = require('lodash-node');
@@ -77,6 +77,7 @@ phantom.onError = function(msg, trace) {
 
 // Note: LinkedIn retrieves 6 comments/click
 var LINKEDIN_LOAD_AMOUNT = 6;
+var BASE_DIR = '/vagrant'
 
 /**
 GLOBAL VARIABLES
@@ -89,6 +90,7 @@ var auth = {
   pass: casper.cli.get('pass'),
 };
 
+
 /**************************************************
  *                  HELPERS                       *
  **************************************************/
@@ -96,7 +98,7 @@ var auth = {
 // TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var check_login = 1;
 var amILoggedIn = function() {
-    this.capture('/vagrant/logging-in'+check_login+'.png');
+    this.capture(BASE_DIR + '/logging-in'+check_login+'.png');
     check_login += 1;
     var logged_in = this.evaluate(function(){
         return document.querySelectorAll('.nav-item').length > 3;
@@ -106,7 +108,7 @@ var amILoggedIn = function() {
 
 // TODO: Accept filename paramater
 var captureScreen = function() {
-  this.capture('/vagrant/test.png');
+  this.capture(BASE_DIR + '/test.png');
 }
 
 var captureComments = function() {
@@ -146,7 +148,7 @@ var moreComments = function() {
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login', function login() {
     this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
-    this.capture('/vagrant/login.png');
+    this.capture('static/img/login.png');
 });
 
 
@@ -176,7 +178,7 @@ casper.waitFor(amILoggedIn, function(){
     this.click('#control_gen_7');
     this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, sendPitch);
     if (!sendPitch) {
-        this.capture('/vagrant/message_'+toUserID+'.png');
+        this.capture(BASE_DIR + '/message_'+toUserID+'.png');
     }
     this.echo(JSON.stringify({'sent': sendPitch, 'to': toUserID}));
   });
@@ -193,14 +195,14 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-    this.capture('/vagrant/homepage.png');
+    this.capture(BASE_DIR + '/homepage.png');
     var groupUrl = casper.cli.get('discuss-url');
     this.open(groupUrl)
 });
 
 // Keep loading all comments until we reach the total
 casper.then(function(){
-    this.capture('/vagrant/group.png');
+    this.capture(BASE_DIR + '/group.png');
     var total = this.evaluate(function(){ 
         return parseInt(document.querySelector('span.count').innerText) 
     });
@@ -233,7 +235,7 @@ casper.then(function(){
 // Side Effect: Will show up on their 'People Viewed Your Profile'
 casper.then(function(){
   this.each(comments, function(self, comment){
-    this.capture('/vagrant/profile'+comment['userID']+'.png');
+    this.capture(BASE_DIR + '/profile'+comment['userID']+'.png');
     this.thenOpen(comment.profileURL, function(){
       comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
       comment['isFirstDegree'] = comment['connection'] == 1;
@@ -241,7 +243,8 @@ casper.then(function(){
   });
 });
 
-casper.run(function(){
+casper.run(function(){ 
+  this.capture(BASE_DIR + '/comments.png');
   this.echo(JSON.stringify(comments));
   this.exit();
 });

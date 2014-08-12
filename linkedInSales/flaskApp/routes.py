@@ -1,8 +1,8 @@
 from flaskApp import app
-from flask import render_template, request, flash, session, url_for, redirect
-from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm
+from flask import render_template, request, flash, session, url_for, redirect, jsonify
+from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm, PitchForm
 from flask.ext.mail import Message, Mail
-from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople
+from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch
 import subprocess
 import json
 
@@ -88,15 +88,41 @@ def addGroup():
       if form.validate() == False:
         return render_template('addGroup.html', form=form)
       else:
-        newGroup = Group(form.groupID.data)
+	totalTitle = form.title.data + " - " + form.groupID.data
+        newGroup = Group(form.groupID.data, totalTitle)
         db.session.add(newGroup)
         db.session.commit()
 
-        form.groupID.data = ""
-        return render_template('addGroup.html', form=form)
+        return render_template('addGroup.html', success=True)
 
     elif request.method == 'GET':
       return render_template('addGroup.html', form=form)
+
+@app.route('/addPitch', methods=['GET', 'POST'])
+def addPitch():
+
+  if 'email' not in session:
+    return redirect(url_for('signin'))
+
+  user = Smarketer.query.filter_by(username = session['email']).first()
+
+  if user is None:
+    return redirect(url_for('signin'))
+  else:
+    form = PitchForm()
+
+    if request.method == 'POST':
+      if form.validate() == False:
+        return render_template('addPitch.html', form=form)
+      else:
+        newPitch = Pitch(form.subject.data, form.message.data)
+        db.session.add(newPitch)
+        db.session.commit()
+
+        return render_template('addPitch.html', success=True)
+
+    elif request.method == 'GET':
+      return render_template('addPitch.html', form=form)
 
 @app.route('/sendPitch', methods=['POST'])
 def sendPitch():
@@ -119,6 +145,15 @@ def addDiscussionThread():
     return redirect(url_for('signin'))
 
   user = Smarketer.query.filter_by(username = session['email']).first()
+  savedDiscussionThread = False
+
+  def saveDiscussionThread():
+    #saves new discussionThread in database
+    newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data, form.title.data)
+    db.session.add(newDiscussionThread)
+    db.session.commit()
+    savedDiscussionThread = True
+
 
   if user is None:
     return redirect(url_for('signin'))
@@ -130,12 +165,8 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-        #saves new discussionThread in database
-        newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data)
-        db.session.add(newDiscussionThread)
-        db.session.commit()
 	
-	usernameText = "--user='" + user.username + "'"
+        usernameText = "--user='" + user.username + "'"
         passwordText = "--pass='" + aes_decrypt(user.password) + "'"
         firstNameText = "--first-name='" + user.firstName + "'"
         discussionURLText = "--discuss-url='" + form.url.data + "'"
@@ -147,7 +178,7 @@ def addDiscussionThread():
             comments = output[0]
             err = 'CasperJS timed out'
             print err
-            response = jsonify(err)
+            response = jsonify(msg=err)
             return response
 
         for c in comments:
@@ -167,12 +198,18 @@ def addDiscussionThread():
 
             #saves new warehousePerson to database
             newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+            
+	    if savedDiscussionThread == False:
+              saveDiscussionThread()
+
             db.session.add(newWarehousePerson)
     
         db.session.commit()
 
-        form.url.data = ""
-        return render_template('addDiscussionThread.html', form=form)
+	if savedDiscussionThread:
+	  return render_template('addDiscussionThread.html', success=savedDiscussionThread)
+	else:
+	  return render_template('addDiscussionThread.html', success=savedDiscussionThread, form=form)
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)

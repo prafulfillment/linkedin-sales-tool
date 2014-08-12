@@ -36,9 +36,11 @@ class Smarketer(db.Model):
 class Group(db.Model):
   __tablename__ = 'groups'
   groupID = db.Column(db.Integer, primary_key = True)
+  title = db.Column(db.String(255))
 
-  def __init__(self, groupID):
+  def __init__(self, groupID, title):
     self.groupID = groupID
+    self.title = title
 
   def __str__(self):
     return str(self.groupID)
@@ -47,10 +49,26 @@ class DiscussionThread(db.Model):
   __tablename__ = 'discussionThreads'
   url = db.Column(db.String(767), primary_key = True)
   groupID = db.Column(db.Integer)
+  title = db.Column(db.String(255))
 
-  def __init__(self, url, groupID):
+  def __init__(self, url, groupID, title):
     self.url = url
     self.groupID = groupID
+    self.title = title
+
+class Replies(db.Model):
+  __tablename__ = 'replies'
+  replyID = db.Column(db.Integer, primary_key = True)
+  conversationStarterID = db.Column(db.Integer)
+  fromSmarketer = db.Column(db.Boolean)
+  fromWarehousePeople = db.Column(db.Boolean)
+  message = db.Column(db.Text)
+
+  def __init__(self, conversationStarterID, fromSmarketer, fromWarehousePeople, message):
+    self.conversationStarterID = conversationStarterID
+    self.fromSmarketer = fromSmarketer
+    self.fromWarehousePeople = fromWarehousePeople
+    self.message = message
 
 class WarehousePeople(db.Model):
   __tablename__ = 'warehousePeople'  
@@ -76,3 +94,12 @@ class WarehousePeople(db.Model):
     self.profileURL = profileURL
     self.imageURL = imageURL
 
+class Pitch(db.Model):
+  __tablename__ = 'pitches'
+  pitchID = db.Column(db.Integer, primary_key = True)
+  subject = db.Column(db.String(255))
+  message = db.Column(db.Text)
+
+  def __init__(self, subject, message):
+    self.subject = subject
+    self.message = message
