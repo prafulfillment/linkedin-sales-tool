@@ -95,7 +95,10 @@ var auth = {
 
 // TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var amILoggedIn = function() {
-  return !(this.getTitle().indexOf('Sign In') >= 0);
+    var logged_in = this.evaluate(function(){
+        return document.querySelectorAll('.nav-item').length > 3;
+    });
+    return logged_in;
 } 
 
 // TODO: Accept filename paramater
