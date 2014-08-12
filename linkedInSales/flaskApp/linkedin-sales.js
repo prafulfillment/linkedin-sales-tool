@@ -2,7 +2,7 @@
  *              IMPORT LIBRARIES                  *
  **************************************************/
 
-var DEBUG = true; 
+var DEBUG = false; 
 
 var casper = require('casper').create({
     logLevel: DEBUG? "debug" : "error",
