@@ -3,13 +3,19 @@
 {% block content %}
   <h2>Add a Thread</h2>
 
+  {% if isError == true %}
+    <div class="flash">Error: {{ error }}</div>
+  {% endif %}
+
   {% if success %}
     <div class="flash">Discussion added successfully</div>
-  {% elif success == false %}
-    <div class="flash">Discussion error, is the url correct?</div>
   {% endif %}
 
   {% for message in form.url.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.title.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
 

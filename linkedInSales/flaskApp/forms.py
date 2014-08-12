@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import TextField, TextAreaField, SubmitField, validators, ValidationError, PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from models import db, Smarketer, Group, DiscussionThread, Pitch
+from models import db, Smarketer, Group, DiscussionThread, Pitch, Replies, ConversationStarters
 
 class ContactForm(Form):
   name = TextField("Name",  [validators.Required("Please enter your name.")])
