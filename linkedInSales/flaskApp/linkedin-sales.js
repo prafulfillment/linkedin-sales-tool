@@ -101,11 +101,6 @@ var amILoggedIn = function() {
     return logged_in;
 } 
 
-// TODO: Accept filename paramater
-var captureScreen = function() {
-  this.capture('/vagrant/test.png');
-}
-
 var captureComments = function() {
   var comments = document.querySelectorAll('li.comment-item');
   return Array.prototype.map.call(comments, function(e) {
@@ -143,7 +138,6 @@ var moreComments = function() {
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login', function login() {
     this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
-    this.capture('/vagrant/login.png');
 });
 
 
