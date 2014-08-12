@@ -19,6 +19,29 @@ var system = require('system');
  *               ERROR CALLBACKS                  *
  **************************************************/
 
+// Check for errors in all pages received from LinkedIn
+casper.on('resource.received', function(resource) {
+    var errors  = casper.evaluate(function(){
+        var errs = []; 
+        var getErrors = document.querySelectorAll('.error');
+
+        for (var i=0; i<getErrors.length; i++) { 
+            error = getErrors[i].innerText.trim();
+            
+            // Ignore undisplayed errors on page or error is empty string
+            if (!getErrors[i].offsetParent || !error){
+                continue;
+            }
+            errs.push(error);
+        }
+        return errs;
+    });
+
+    if (errors.length) {
+        casper.die(JSON.stringify({'errors': errors, 'data': casper.cli.options}));
+    }
+});
+
 casper.onConsoleMessage = function(msg) {
     system.stderr.writeLine('console: ' + msg);
 };
