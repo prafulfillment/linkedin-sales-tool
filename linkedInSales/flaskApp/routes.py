@@ -128,15 +128,19 @@ def addPitch():
 def sendPitch():
     # TODO: Create a form for the remaining fields
     user = Smarketer.query.filter_by(username = session['email']).first()
-    usernameText = "--user='" + user.username + "'"
-    passwordText = "--pass='" + aes_decrypt(user.password) + "'"
-    firstNameText = "--first-name='" + user.firstName + "'"
-    toUserID = ''
-    pitchSubject = ''
-    pitchBody = ''
-    groupID = ''
-    sendPitch = not DEBUG
-    proc = subprocess.Popen("casperjs linkedin-sales.js --user={0} --pass={1} --first-name={3} --to-user-id={3} --pitch-subject={4} --pitch-body={5} --group-id={6} --send-pitch={7}".format(usernameText, passwordText, firstNameText, toUserID, pitchSubject, pitchBody, groupID, sendPitch), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    commands = []
+    commands.append("--user='{}'".format( user.username ))
+    commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
+    commands.append("--first-name='{}'".format( user.firstName ))
+    commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
+    commands.append("--to-user-id=")
+    commands.append("--pitch-subject=")
+    commands.append("--pitch-body=")
+    commands.append("--group-id=")
+    commands.append("--send-pitch={}".format((not DEBUG)))
+    command = " ".join(commands)
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = proc.communicate()
 
 @app.route('/addDiscussionThread', methods=['GET', 'POST'])
 def addDiscussionThread():
@@ -165,12 +169,15 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-	
-        usernameText = "--user='" + user.username + "'"
-        passwordText = "--pass='" + aes_decrypt(user.password) + "'"
-        firstNameText = "--first-name='" + user.firstName + "'"
-        discussionURLText = "--discuss-url='" + form.url.data + "'"
-        proc = subprocess.Popen("casperjs /vagrant/linkedInSales/flaskapp/linkedin-sales.js {0} {1} {2} {3}".format(usernameText, passwordText, firstNameText, discussionURLText), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        commands = []
+        commands.append("--user='{}'".format( user.username ))
+        commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
+        commands.append("--first-name='{}'".format( user.firstName ))
+        commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
+        commands.append("--discuss-url='{}'".format( form.url.data ))
+        command = " ".join(commands)
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE)
         output = proc.communicate()
         try:
             comments = json.loads(output[0])
@@ -198,12 +205,12 @@ def addDiscussionThread():
 
             #saves new warehousePerson to database
             newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
-            
+
 	    if savedDiscussionThread == False:
               saveDiscussionThread()
 
             db.session.add(newWarehousePerson)
-    
+
         db.session.commit()
 
 	if savedDiscussionThread:
