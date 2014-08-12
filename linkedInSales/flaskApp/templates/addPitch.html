@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Add a Pitch</h2>
+
+  {% if success %}
+    <div class="flash">Pitch added successfully</div>
+  {% endif %}
+
+  {% for message in form.subject.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.message.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  <form action="{{ url_for('addPitch') }}" method=post>
+    {{ form.hidden_tag() }}
+
+    {{ form.subject.label }}
+    {{ form.subject }}
+
+    {{ form.message.label }}
+    {{ form.message }}
+
+    {{ form.submit }}
+  </form>
+
+{% endblock %}

@@ -7,8 +7,8 @@ var casper = require('casper').create({
     //verbose: true,
     waitTimeout: 30000,
     pageSettings: {
-        loadImages:  false,        // do not load images
-        loadPlugins: false         // do not load NPAPI plugins (e.g. Flash)
+        loadImages:  true,        // do not load images
+        loadPlugins: true         // do not load NPAPI plugins (e.g. Flash)
     }
 });
 var _ = require('lodash-node');
@@ -117,7 +117,7 @@ var moreComments = function() {
 // TODO: Stay logged in via session & cookie management
 casper.start('https://www.linkedin.com/uas/login', function login() {
     this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
-    this.capture('/vagrant/login.png');
+    this.capture('static/img/login.png');
 });
 
 
@@ -164,12 +164,14 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
+    this.capture('static/img/home.png');
     var groupUrl = casper.cli.get('discuss-url');
     this.open(groupUrl)
 });
 
 // Keep loading all comments until we reach the total
 casper.then(function(){
+    this.capture('static/img/group.png');
     var total = this.evaluate(function(){ 
         return parseInt(document.querySelector('span.count').innerText) 
     });
@@ -209,7 +211,8 @@ casper.then(function(){
   });
 });
 
-casper.run(function(){
+casper.run(function(){ 
+  this.capture('static/img/comments.png');
   this.echo(JSON.stringify(comments));
   this.exit();
 });

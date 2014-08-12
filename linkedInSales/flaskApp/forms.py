@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import TextField, TextAreaField, SubmitField, validators, ValidationError, PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from models import db, Smarketer, Group, DiscussionThread
+from models import db, Smarketer, Group, DiscussionThread, Pitch
 
 class ContactForm(Form):
   name = TextField("Name",  [validators.Required("Please enter your name.")])
@@ -12,6 +12,7 @@ class ContactForm(Form):
 
 class GroupForm(Form):
   groupID = TextField("groupID",  [validators.Required("Please enter the groupID")])
+  title = TextField("title",  [validators.Required("Please enter the group title")])
   submit = SubmitField("Add a group")
 
   def __init__(self, *args, **kwargs):
@@ -28,6 +29,20 @@ class GroupForm(Form):
     else:
       return True
 
+class PitchForm(Form):
+  subject = TextField("subject",  [validators.Required("Please enter the subject")])
+  message = TextAreaField("message",  [validators.Required("Please enter the message")])
+  submit = SubmitField("Add a pitch")
+
+  def __init__(self, *args, **kwargs):
+    Form.__init__(self, *args, **kwargs)
+
+  def validate(self):
+    if not Form.validate(self):
+      return False
+    else:
+      return True
+
 class DiscussionThreadForm(Form):
   def __init__(self, *args, **kwargs):
     Form.__init__(self, *args, **kwargs)
@@ -36,8 +51,10 @@ class DiscussionThreadForm(Form):
     return Group.query.all()
 
   url = TextField("url",  [validators.Required("Please enter the url")]) 
+  title = TextField("title",  [validators.Required("Please enter the title")])
   submit = SubmitField("Add a discussion thread")
-  groupID = QuerySelectField("groupID", [validators.Required("Please select a valid groupID")], query_factory=populateForm)
+  groupID = QuerySelectField("groupID", [validators.Required("Please select a valid groupID")], get_label="title",  query_factory=populateForm)
+
 
   def validate(self):
     if not Form.validate(self):
