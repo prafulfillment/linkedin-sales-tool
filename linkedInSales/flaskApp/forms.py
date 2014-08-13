@@ -74,9 +74,9 @@ class ConversationStartersForm(Form):
       return False
 
     validPitches = WarehousePeople.query.filter_by(discussionURL = self.discussionThreadURL.data, isPitched = False).count()
-    pitchNumberValid = self.pitchNumber.data <= validPitches
+    pitchNumberValid = int(self.pitchNumber.data) <= validPitches
     if pitchNumberValid == False:
-      self.pitchNumber.errors.append("Enter " + str(validPitches) + " or less")
+      self.pitchNumber.errors.append("Enter " + str(validPitches) + " or less. You entered "+ str(self.pitchNumber.data))
       return False
 
     return True 
