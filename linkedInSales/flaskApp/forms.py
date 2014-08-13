@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import TextField, TextAreaField, SubmitField, validators, ValidationError, PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from models import db, Smarketer, Group, DiscussionThread, Pitch, Replies, ConversationStarters
+from models import db, Smarketer, Group, DiscussionThread, Pitch, Replies, ConversationStarters, WarehousePeople
 
 class ContactForm(Form):
   name = TextField("Name",  [validators.Required("Please enter your name.")])
@@ -26,8 +26,8 @@ class GroupForm(Form):
     if groupIDExists:
       self.groupID.errors.append("That group has already been added")
       return False
-    else:
-      return True
+    
+    return True
 
 class PitchForm(Form):
   subject = TextField("subject",  [validators.Required("Please enter the subject")])
@@ -41,8 +41,8 @@ class PitchForm(Form):
   def validate(self):
     if not Form.validate(self):
       return False
-    else:
-      return True
+    
+    return True
 
 class ConversationStartersForm(Form):
   def __init__(self, *args, **kwargs):
@@ -64,26 +64,22 @@ class ConversationStartersForm(Form):
       return False
 
     pitchIDExists = Pitch.query.filter_by(pitchID = self.pitchID.data).first()
-    if pitchIDExists:
-      return True
-    else:
+    if pitchIDExists == False:
       self.pitchID.errors.append("That pitch does not exist")
       return False  
 
-    discussionThreadURLExists = DiscussionThread.query.filter_by(discussionThreadURL = self.url.data).first()
-    if discussionThreadURLExists:
-      return True
-    else:
+    discussionThreadURLExists = DiscussionThread.query.filter_by(url = self.discussionThreadURL).first()
+    if discussionThreadURLExists == False:
       self.discussionThreadURL.errors.append("That discussion thread does not exist")
       return False
 
-    validPitches = WarehousePeople.query.filter_by(discussionURL = self.url.data, isPitched = false).count()
-    pitchNumberValid <= validPitches
-    if pitchNumberValid:
-      return True
-    else:
-      self.pitchNumber.errors.append("Enter " + validPitches + " or less")
+    validPitches = WarehousePeople.query.filter_by(discussionURL = self.discussionThreadURL.data, isPitched = False).count()
+    pitchNumberValid = self.pitchNumber.data <= validPitches
+    if pitchNumberValid == False:
+      self.pitchNumber.errors.append("Enter " + str(validPitches) + " or less")
       return False
+
+    return True 
   
 class DiscussionThreadForm(Form):
   def __init__(self, *args, **kwargs):
@@ -107,11 +103,11 @@ class DiscussionThreadForm(Form):
       return False
 
     groupIDExists = Group.query.filter_by(groupID = self.groupID.data).first()
-    if groupIDExists:
-      return True
-    else:
+    if groupIDExists == False:
       self.groupID.errors.append("That groupID does not exist")
       return False
+
+    return True
 
 class SignupForm(Form):
   firstName = TextField("First name",  [validators.Required("Please enter your first name.")])
@@ -130,8 +126,8 @@ class SignupForm(Form):
     if user:
       self.username.errors.append("That account has already been created")
       return False
-    else:
-      return True
+   
+    return True
 
 class SigninForm(Form):
   username = TextField("Email",  [validators.Required("Please enter your linkedIn email address."), validators.Email("Please enter your linkedIn email address.")])
@@ -146,8 +142,8 @@ class SigninForm(Form):
       return False
     
     user = Smarketer.query.filter_by(username = self.username.data).first()
-    if user and user.check_password(self.password.data):
-      return True
-    else:
+    if (user == False) and (user.check_password(self.password.data) == False):
       self.username.errors.append("Invalid e-mail or password")
       return False
+    
+    return True
