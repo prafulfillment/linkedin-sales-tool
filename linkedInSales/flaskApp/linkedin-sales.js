@@ -2,17 +2,20 @@
  *              IMPORT LIBRARIES                  *
  **************************************************/
 
+var DEBUG = false; 
+
 var casper = require('casper').create({
-    //logLevel: "debug",
-    //verbose: true,
+    logLevel: DEBUG? "debug" : "error",
+    verbose: DEBUG,
     waitTimeout: 30000,
     pageSettings: {
-        loadImages:  true,        // do not load images
-        loadPlugins: true         // do not load NPAPI plugins (e.g. Flash)
+        loadImages:  false,        // do not load images
+        loadPlugins: false,         // do not load NPAPI plugins (e.g. Flash)
     }
 });
 var _ = require('lodash-node');
 var system = require('system');
+var fs = require('fs');
 
 
 /**************************************************
@@ -88,6 +91,7 @@ var comments_count = 0;
 var auth = {
   user: casper.cli.get('user'),
   pass: casper.cli.get('pass'),
+  name: casper.cli.get('first-name'),
 };
 
 
@@ -95,21 +99,15 @@ var auth = {
  *                  HELPERS                       *
  **************************************************/
 
-// TODO: Use logged in session/cookies -- http://stackoverflow.com/questions/15907800/how-to-persist-cookies-between-different-casperjs-processes
 var check_login = 1;
 var amILoggedIn = function() {
-    this.capture(BASE_DIR + '/logging-in'+check_login+'.png');
+    DEBUG && casper.capture(BASE_DIR + '/logging-in'+check_login+'.png');
     check_login += 1;
-    var logged_in = this.evaluate(function(){
+    var logged_in = casper.evaluate(function(){
         return document.querySelectorAll('.nav-item').length > 3;
     });
     return logged_in;
 } 
-
-// TODO: Accept filename paramater
-var captureScreen = function() {
-  this.capture(BASE_DIR + '/test.png');
-}
 
 var captureComments = function() {
   var comments = document.querySelectorAll('li.comment-item');
@@ -144,15 +142,34 @@ var moreComments = function() {
  *                    LOGIN                       *
  **************************************************/
 
-// Login to LinkedIn
-// TODO: Stay logged in via session & cookie management
-casper.start('https://www.linkedin.com/uas/login', function login() {
-    this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
-    this.capture('static/img/login.png');
+// Load up our cookies
+/*
+var file = auth.name+"-cookies.txt";
+if (fs.exists(file)) {
+    var data = fs.read(file)
+    phantom.cookies = JSON.parse(data)
+}
+*/
+
+// Skip login if our cookies are good
+casper.start('https://www.linkedin.com/', function() {
+    //console.log(data);
+    DEBUG && this.capture(BASE_DIR + '/linkedin.png');
+});
+
+// Test if we're already logged in
+casper.thenBypassIf(amILoggedIn, 2);
+
+// Login if cookies are expired or missing
+// thenOpen counts as 2 steps
+casper.thenOpen('https://www.linkedin.com/uas/login', function(){
+        this.fill('form#login', {session_key: auth.user, session_password: auth.pass}, true)
+        DEBUG && this.capture(BASE_DIR + '/login.png');
 });
 
 
-// Skip Send Pitch
+// Send Pitch and Import Discussion are two separate steps
+// We only check for Send Pitch, we'll need more checks as we add steps
 casper.thenBypassIf(function(){
     return !casper.cli.has('send-pitch');
 }, 2); 
@@ -168,7 +185,7 @@ casper.waitFor(amILoggedIn, function(){
   var toUserID = casper.cli.get('to-user-id');
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
-  var sendPitch = !!casper.cli.get('send-pitch');
+  var sendPitch = false; //!!casper.cli.get('send-pitch');
   var groupID = casper.cli.get('group-id');
 
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
@@ -177,9 +194,7 @@ casper.waitFor(amILoggedIn, function(){
   this.thenOpen(msgUrl, function(){
     this.click('#control_gen_7');
     this.fill('form#send-msg-form', {subject: pitchSubject, body: pitchBody}, sendPitch);
-    if (!sendPitch) {
-        this.capture(BASE_DIR + '/message_'+toUserID+'.png');
-    }
+    DEBUG && this.capture(BASE_DIR + '/message_'+toUserID+'.png');
     this.echo(JSON.stringify({'sent': sendPitch, 'to': toUserID}));
   });
 });
@@ -195,14 +210,14 @@ casper.then(function(){
 
 // Once logged in, open up the discussion url
 casper.waitFor(amILoggedIn, function(){
-    this.capture(BASE_DIR + '/homepage.png');
+    DEBUG && this.capture(BASE_DIR + '/homepage.png');
     var groupUrl = casper.cli.get('discuss-url');
     this.open(groupUrl)
 });
 
 // Keep loading all comments until we reach the total
 casper.then(function(){
-    this.capture(BASE_DIR + '/group.png');
+    DEBUG && this.capture(BASE_DIR + '/group.png');
     var total = this.evaluate(function(){ 
         return parseInt(document.querySelector('span.count').innerText) 
     });
@@ -234,17 +249,16 @@ casper.then(function(){
 // Note: -1 means out of network
 // Side Effect: Will show up on their 'People Viewed Your Profile'
 casper.then(function(){
-  this.each(comments, function(self, comment){
-    this.capture(BASE_DIR + '/profile'+comment['userID']+'.png');
-    this.thenOpen(comment.profileURL, function(){
-      comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
-      comment['isFirstDegree'] = comment['connection'] == 1;
+    this.each(comments, function(self, comment){
+        this.thenOpen(comment.profileURL, function(){
+            DEBUG && this.capture(BASE_DIR + '/profile'+comment['userID']+'.png');
+            comment['connection'] = parseInt(this.fetchText('span.fp-degree-icon')) || -1;
+            comment['isFirstDegree'] = comment['connection'] == 1;
+        });
     });
-  });
 });
 
 casper.run(function(){ 
-  this.capture(BASE_DIR + '/comments.png');
   this.echo(JSON.stringify(comments));
   this.exit();
 });

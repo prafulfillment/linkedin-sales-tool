@@ -5,6 +5,7 @@ from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch, ConversationStarters, Replies
 import subprocess
 import json
+import os
 
 mail = Mail()
 
@@ -131,7 +132,6 @@ def addPitch():
 
 @app.route('/sendPitch', methods=['GET', 'POST'])
 def sendPitch():
-
   if 'email' not in session:
     return redirect(url_for('signin'))
 
@@ -152,6 +152,20 @@ def sendPitch():
     	  DiscussionThread = DiscussionThread.query.filter_by(url = form.discussionThreadURL.data).first()
 
 	  pitchWarehousePeople = WarehousePeople.query.filter_by(discussionURL = form.discussionThreadURL.data, isPitched = false).limit(form.pitchNumber.data)
+    script_path = os.path.abspath('./flaskApp')
+    commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
+    commands.append("--user='{}'".format( user.username ))
+    commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
+    commands.append("--first-name='{}'".format( user.firstName ))
+    commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
+    commands.append("--to-user-id=")
+    commands.append("--pitch-subject=")
+    commands.append("--pitch-body=")
+    commands.append("--group-id=")
+    commands.append("--send-pitch={}".format('false'))
+    command = " ".join(commands)
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = proc.communicate()
 
 	  for p in form.pitchNumber.data:
     	    usernameText = "--user='" + user.username + "'"
@@ -204,12 +218,15 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-	
-        usernameText = "--user='" + user.username + "'"
-        passwordText = "--pass='" + aes_decrypt(user.password) + "'"
-        firstNameText = "--first-name='" + user.firstName + "'"
-        discussionURLText = "--discuss-url='" + form.url.data + "'"
-        proc = subprocess.Popen("casperjs /vagrant/linkedInSales/flaskapp/linkedin-sales.js {0} {1} {2} {3}".format(usernameText, passwordText, firstNameText, discussionURLText), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        script_path = os.path.abspath('./flaskApp')
+        commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
+        commands.append("--user='{}'".format( user.username ))
+        commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
+        commands.append("--first-name='{}'".format( user.firstName ))
+        commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
+        commands.append("--discuss-url='{}'".format( form.url.data ))
+        command = " ".join(commands)
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         output = proc.communicate()
         try:
             comments = json.loads(output[0])
@@ -237,12 +254,12 @@ def addDiscussionThread():
 
             #saves new warehousePerson to database
             newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
-            
+
 	    if savedDiscussionThread == False:
               saveDiscussionThread()
 
             db.session.add(newWarehousePerson)
-    
+
         db.session.commit()
 
 	if savedDiscussionThread:
