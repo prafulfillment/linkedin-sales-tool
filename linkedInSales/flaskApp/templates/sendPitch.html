@@ -3,8 +3,10 @@
 {% block content %}
   <h2>Send a Pitch</h2>
 
-  {% if success %}
-    <div class="flash">Pitches sent successfully: blah blah</div>
+  {% if completeSuccess %}
+    <div class="flash">All pitches sent successfully</div>
+  {% elif completeSuccess == false  %}
+    <div class="flash"> {{ errors }} </div>
   {% endif %}
 
   {% for message in form.pitchID.errors %}

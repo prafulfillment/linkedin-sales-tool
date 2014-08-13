@@ -25,11 +25,12 @@ class ConversationStarters(db.Model):
   isFirstDegree = db.Column(db.Boolean)
   isReplied = db.Column(db.Boolean)
 
-  def __init__(self, warehousePeopleID, smarketerPitched, pitchID, connectionDistance, isFirstDegree, isReplied):
+  def __init__(self, warehousePeopleID, smarketerPitched, pitchID):
     self.warehousePeopleID = warehousePeopleID
     self.smarketerPitched = smarketerPitched
     self.pitchID = pitchID
-    self.connectionDistance = connectionDistance
+    #TODO: make connectionDistance work
+    self.connectionDistance = 0
 
 class Smarketer(db.Model):
   __tablename__ = 'smarketers'

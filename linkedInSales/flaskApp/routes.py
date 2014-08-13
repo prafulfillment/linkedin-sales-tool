@@ -160,6 +160,9 @@ def sendPitch():
             commands.append("--send-pitch={}".format('false'))
             base_command = " ".join(commands)
 
+	    errors = "Failed IDs: "
+	    copmleteSuccess = True
+
             for p in form.pitchNumber.data:
                 pitch_commands = []
                 pitch_commands.append("--to-user-id='{}'".format(p[pitchWarehousePeople]))
@@ -171,15 +174,17 @@ def sendPitch():
                 output = proc.communicate()
                 status = json.loads(output[0])
                 # status will look like: {'sent': boolean, 'to': toUserID}
-
-                #TODO: open subprocess, return true or false for this warehousePerson
-
-                #saves new conversationStarters in database
-                #newConversationStarter = ConversationStarters(form.url.data, form.groupID.data, form.title.data)
-                #db.session.add(newConversationStarter)
-                #db.session.commit()
-                form.pitchNumber.data = ""
-            return render_template('sendPitch.html', form=form, success=True) #TODO: insert array to tell which ones failed
+		if status['sent']:
+		  #saves new conversationStarters in database
+                  newConversationStarter = ConversationStarters(status['to'], user.userID, pitch.pitchID)
+                  db.session.add(newConversationStarter)
+                  db.session.commit() 
+		else:
+		  completeSuccess = False
+		  errors = errors + status['to'] + ","
+            
+	    form.pitchNumber.data = ""
+            return render_template('sendPitch.html', form=form, success=completeSuccess, errors=errors) #TODO: insert array to tell which ones failed
 
     elif request.method == 'GET':
         return render_template('sendPitch.html', form=form)
