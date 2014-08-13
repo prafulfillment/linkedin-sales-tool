@@ -32,6 +32,7 @@ class GroupForm(Form):
 class PitchForm(Form):
   subject = TextField("subject",  [validators.Required("Please enter the subject")])
   message = TextAreaField("message",  [validators.Required("Please enter the message")])
+  groupTitle = TextField("title",  [validators.Required("Please enter the title")])
   submit = SubmitField("Add a pitch")
 
   def __init__(self, *args, **kwargs):
@@ -43,18 +44,58 @@ class PitchForm(Form):
     else:
       return True
 
+class ConversationStartersForm(Form):
+  def __init__(self, *args, **kwargs):
+    Form.__init__(self, *args, **kwargs)
+  
+  def getAllPitchIDs():
+    return Pitch.query.all()
+  
+  def getAllDiscussionThreadURLs():
+    return DiscussionThread.query.all()
+  
+  submit = SubmitField("Send out pitches")
+  discussionThreadURL = QuerySelectField("discussion threads", [validators.Required("Please select a valid discussion thread")], get_label="title",  query_factory=getAllDiscussionThreadURLs)
+  pitchID = QuerySelectField("pitches", [validators.Required("Please select a valid pitch")], get_label="title",  query_factory=getAllPitchIDs)
+  pitchNumber = TextField("# of ppl",  [validators.Required("Please enter a valid number")])
+  
+  def validate(self):
+    if not Form.validate(self):
+      return False
+
+    pitchIDExists = Pitch.query.filter_by(pitchID = self.pitchID.data).first()
+    if pitchIDExists:
+      return True
+    else:
+      self.pitchID.errors.append("That pitch does not exist")
+      return False  
+
+    discussionThreadURLExists = DiscussionThread.query.filter_by(discussionThreadURL = self.url.data).first()
+    if discussionThreadURLExists:
+      return True
+    else:
+      self.discussionThreadURL.errors.append("That discussion thread does not exist")
+      return False
+
+    validPitches = WarehousePeople.query.filter_by(discussionURL = self.url.data, isPitched = false).count()
+    pitchNumberValid <= validPitches
+    if pitchNumberValid:
+      return True
+    else:
+      self.pitchNumber.errors.append("Enter " + validPitches + " or less")
+      return False
+  
 class DiscussionThreadForm(Form):
   def __init__(self, *args, **kwargs):
     Form.__init__(self, *args, **kwargs)
 
-  def populateForm():
+  def getAllGroupIDs():
     return Group.query.all()
 
   url = TextField("url",  [validators.Required("Please enter the url")]) 
   title = TextField("title",  [validators.Required("Please enter the title")])
   submit = SubmitField("Add a discussion thread")
-  groupID = QuerySelectField("groupID", [validators.Required("Please select a valid groupID")], get_label="title",  query_factory=populateForm)
-
+  groupID = QuerySelectField("groupID", [validators.Required("Please select a valid groupID")], get_label="title",  query_factory=getAllGroupIDs)
 
   def validate(self):
     if not Form.validate(self):

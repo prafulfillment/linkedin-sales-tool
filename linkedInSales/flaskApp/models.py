@@ -25,12 +25,11 @@ class ConversationStarters(db.Model):
   isFirstDegree = db.Column(db.Boolean)
   isReplied = db.Column(db.Boolean)
 
-  def __init__(self, smarketerPitched, pitchID, connectionDistance, isFirstDegree, isReplied):
+  def __init__(self, warehousePeopleID, smarketerPitched, pitchID, connectionDistance, isFirstDegree, isReplied):
+    self.warehousePeopleID = warehousePeopleID
     self.smarketerPitched = smarketerPitched
     self.pitchID = pitchID
     self.connectionDistance = connectionDistance
-    self.isFirstDegree = isFirstDegree
-    self.isReplied = isReplied
 
 class Smarketer(db.Model):
   __tablename__ = 'smarketers'
@@ -73,6 +72,9 @@ class DiscussionThread(db.Model):
     self.groupID = groupID
     self.title = title
 
+  def __str__(self):
+    return str(self.url)
+
 class Replies(db.Model):
   __tablename__ = 'replies'
   replyID = db.Column(db.Integer, primary_key = True)
@@ -99,6 +101,7 @@ class WarehousePeople(db.Model):
   likesCount = db.Column(db.Integer)
   profileURL = db.Column(db.String(255))
   imageURL = db.Column(db.String(255))
+  isPitched = db.Column(db.Boolean)
 
   def __init__(self, userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL):
     self.userID = userID
@@ -116,7 +119,12 @@ class Pitch(db.Model):
   pitchID = db.Column(db.Integer, primary_key = True)
   subject = db.Column(db.String(255))
   message = db.Column(db.Text)
+  title = db.Column(db.String(255))
 
-  def __init__(self, subject, message):
+  def __init__(self, subject, message, title):
     self.subject = subject
     self.message = message
+    self.title = title
+
+  def __str__(self):
+    return str(self.pitchID)

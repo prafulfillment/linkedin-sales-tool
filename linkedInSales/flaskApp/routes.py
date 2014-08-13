@@ -1,6 +1,6 @@
 from flaskApp import app
 from flask import render_template, request, flash, session, url_for, redirect, jsonify
-from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm, PitchForm
+from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm, PitchForm, ConversationStartersForm
 from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch, ConversationStarters, Replies
 import subprocess
@@ -93,7 +93,9 @@ def addGroup():
         db.session.add(newGroup)
         db.session.commit()
 
-        return render_template('addGroup.html', success=True)
+	form.groupID.data = ""
+	form.title.data = ""
+        return render_template('addGroup.html', form=form, success=True)
 
     elif request.method == 'GET':
       return render_template('addGroup.html', form=form)
@@ -115,28 +117,65 @@ def addPitch():
       if form.validate() == False:
         return render_template('addPitch.html', form=form)
       else:
-        newPitch = Pitch(form.subject.data, form.message.data)
+        newPitch = Pitch(form.subject.data, form.message.data, form.groupTitle.data)
         db.session.add(newPitch)
         db.session.commit()
 
-        return render_template('addPitch.html', success=True)
+        form.subject.data = ""
+	form.message.data = ""
+	form.groupTitle.data = ""
+	return render_template('addPitch.html', form=form, success=True)
 
     elif request.method == 'GET':
       return render_template('addPitch.html', form=form)
 
-@app.route('/sendPitch', methods=['POST'])
+@app.route('/sendPitch', methods=['GET', 'POST'])
 def sendPitch():
-    # TODO: Create a form for the remaining fields
-    user = Smarketer.query.filter_by(username = session['email']).first()
-    usernameText = "--user='" + user.username + "'"
-    passwordText = "--pass='" + aes_decrypt(user.password) + "'"
-    firstNameText = "--first-name='" + user.firstName + "'"
-    toUserID = ''
-    pitchSubject = ''
-    pitchBody = ''
-    groupID = ''
-    sendPitch = not DEBUG
-    proc = subprocess.Popen("casperjs linkedin-sales.js --user={0} --pass={1} --first-name={3} --to-user-id={3} --pitch-subject={4} --pitch-body={5} --group-id={6} --send-pitch={7}".format(usernameText, passwordText, firstNameText, toUserID, pitchSubject, pitchBody, groupID, sendPitch), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+  if 'email' not in session:
+    return redirect(url_for('signin'))
+
+  user = Smarketer.query.filter_by(username = session['email']).first()
+
+  if user is None:
+    return redirect(url_for('signin'))
+  else:
+    form = ConversationStartersForm()
+
+    if request.method == 'POST':
+      if form.validate() == False:
+        return render_template('sendPitch.html', form=form)
+
+      else:
+          ''' 
+          pitch = Pitch.query.filter_by(pitchID = form.pitchID.data).first()
+    	  DiscussionThread = DiscussionThread.query.filter_by(url = form.discussionThreadURL.data).first()
+
+	  pitchWarehousePeople = WarehousePeople.query.filter_by(discussionURL = form.discussionThreadURL.data, isPitched = false).limit(form.pitchNumber.data)
+
+	  for p in form.pitchNumber.data:
+    	    usernameText = "--user='" + user.username + "'"
+    	    passwordText = "--pass='" + aes_decrypt(user.password) + "'"
+    	    firstNameText = "--first-name='" + user.firstName + "'"
+    	    toUserID = p[pitchWarehousePeople]
+    	    pitchSubject = pitch.subject
+    	    pitchBody = pitch.message
+    	    groupID = discussionThread.groupID
+     	    sendPitch = not DEBUG
+    	    proc = subprocess.Popen("casperjs linkedin-sales.js --user={0} --pass={1} --first-name={3} --to-user-id={3} --pitch-subject={4} --pitch-body={5} --group-id={6} --send-pitch={7}".format(usernameText, passwordText, firstNameText, toUserID, pitchSubject, pitchBody, groupID, sendPitch), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+	    #TODO: open subprocess, return true or false for this warehousePerson
+ 
+	    #saves new conversationStarters in database
+            #newConversationStarter = ConversationStarters(form.url.data, form.groupID.data, form.title.data)
+    	    #db.session.add(newConversationStarter)
+       	    #db.session.commit()
+            '''
+	  form.pitchNumber.data = ""
+          return render_template('sendPitch.html', form=form, success=True) #TODO: insert array to tell which ones failed
+
+    elif request.method == 'GET':
+      return render_template('sendPitch.html', form=form)
 
 @app.route('/addDiscussionThread', methods=['GET', 'POST'])
 def addDiscussionThread():
@@ -207,7 +246,9 @@ def addDiscussionThread():
         db.session.commit()
 
 	if savedDiscussionThread:
-	  return render_template('addDiscussionThread.html', success=savedDiscussionThread)
+	  form.title.data = ""
+	  form.url.data = ""
+	  return render_template('addDiscussionThread.html', form=form, success=savedDiscussionThread)
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)

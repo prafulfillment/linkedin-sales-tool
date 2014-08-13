@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Send a Pitch</h2>
+
+  {% if success %}
+    <div class="flash">Pitches sent successfully: blah blah</div>
+  {% endif %}
+
+  {% for message in form.pitchID.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.discussionThreadURL.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.pitchNumber.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  <form action="{{ url_for('sendPitch') }}" method=post>
+    {{ form.hidden_tag() }}
+
+    {{ form.pitchID.label }}
+    {{ form.pitchID }}
+
+    {{ form.discussionThreadURL.label }}
+    {{ form.discussionThreadURL }}
+
+    {{ form.pitchNumber.label }}
+    {{ form.pitchNumber }}
+
+    {{ form.submit }}
+  </form>
+
+{% endblock %}
