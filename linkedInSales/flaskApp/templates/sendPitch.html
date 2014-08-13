@@ -3,9 +3,9 @@
 {% block content %}
   <h2>Send a Pitch</h2>
 
-  {% if completeSuccess %}
+  {% if success %}
     <div class="flash">All pitches sent successfully</div>
-  {% elif completeSuccess == false  %}
+  {% elif success == False %}
     <div class="flash"> {{ errors }} </div>
   {% endif %}
 
