@@ -7,6 +7,23 @@
     <div class="flash">Pitch added successfully</div>
   {% endif %}
 
+  <div>
+   Template - 
+
+   {% raw %}
+       {{ context.fieldName }}
+   {% endraw %} 
+       
+   <br /><br />
+
+   <strong>Contexts Supported:</strong>
+   <ul>
+       <li><b>warehousePerson</b> - warehousePeople</li>
+       <li><b>discussionThread</b> - discussionThreads</li>
+       <li><b>user</b> - smarketers</li>
+   </ul>
+  </div>
+
   {% for message in form.subject.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
