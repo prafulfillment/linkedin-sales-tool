@@ -139,7 +139,7 @@ def sendPitch():
     commands.append("--pitch-subject=")
     commands.append("--pitch-body=")
     commands.append("--group-id=")
-    commands.append("--send-pitch={}".format((not DEBUG)))
+    commands.append("--send-pitch={}".format('false'))
     command = " ".join(commands)
     proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = proc.communicate()

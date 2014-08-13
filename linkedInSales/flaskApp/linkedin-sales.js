@@ -185,7 +185,7 @@ casper.waitFor(amILoggedIn, function(){
   var toUserID = casper.cli.get('to-user-id');
   var pitchSubject = casper.cli.get('pitch-subject');
   var pitchBody = casper.cli.get('pitch-body').replace(/\\n/g,'\n');
-  var sendPitch = !!casper.cli.get('send-pitch');
+  var sendPitch = false; //!!casper.cli.get('send-pitch');
   var groupID = casper.cli.get('group-id');
 
   var msgPartial = 'https://www.linkedin.com/groups?viewMemberFeed=&gid='+groupID+'&memberID='
