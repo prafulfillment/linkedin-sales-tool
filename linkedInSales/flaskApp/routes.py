@@ -148,9 +148,10 @@ def sendPitch():
 
         else:
             pitch = Pitch.query.filter_by(pitchID = form.pitchID.data).first()
-            DiscussionThread = DiscussionThread.query.filter_by(url = form.discussionThreadURL.data).first()
+            discussionThread = DiscussionThread.query.filter_by(url = form.discussionThreadURL.data).first()
+            number_pitches = int(form.pitchNumber.data)
 
-            pitchWarehousePeople = WarehousePeople.query.filter_by(discussionURL = form.discussionThreadURL.data, isPitched = false).limit(form.pitchNumber.data)
+            pitchWarehousePeople = WarehousePeople.query.filter_by(discussionURL = form.discussionThreadURL.data, isPitched = False).limit(number_pitches)
             script_path = os.path.abspath('./flaskApp')
             commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
             commands.append("--user='{}'".format( user.username ))
@@ -160,12 +161,12 @@ def sendPitch():
             commands.append("--send-pitch={}".format('false'))
             base_command = " ".join(commands)
 
-	    errors = "Failed IDs: "
-	    copmleteSuccess = True
+            errors = "Failed IDs: "
+            sentSuccess = None
 
-            for p in form.pitchNumber.data:
+            for p in xrange(number_pitches):
                 pitch_commands = []
-                pitch_commands.append("--to-user-id='{}'".format(p[pitchWarehousePeople]))
+                pitch_commands.append("--to-user-id='{}'".format(pitchWarehousePeople[p].userID))
                 pitch_commands.append("--pitch-subject={}".format(pitch.subject))
                 pitch_commands.append("--pitch-body={}".format(pitch.message))
                 pitch_commands.append("--group-id={}".format(discussionThread.groupID))
@@ -174,96 +175,84 @@ def sendPitch():
                 output = proc.communicate()
                 status = json.loads(output[0])
                 # status will look like: {'sent': boolean, 'to': toUserID}
-		if status['sent']:
-		  #saves new conversationStarters in database
-                  newConversationStarter = ConversationStarters(status['to'], user.userID, pitch.pitchID)
-                  db.session.add(newConversationStarter)
-                  db.session.commit() 
-		else:
-		  completeSuccess = False
-		  errors = errors + status['to'] + ","
-            
-	    form.pitchNumber.data = ""
-            return render_template('sendPitch.html', form=form, success=completeSuccess, errors=errors) #TODO: insert array to tell which ones failed
+                sentSuccess = status['sent']
+
+                if sentSuccess:
+                    newConversationStarter = ConversationStarters(status['to'], user.userID, pitch.pitchID)
+                    db.session.add(newConversationStarter)
+                    db.session.commit()
+                else:
+                    errors = "{0} {1}, ".format(errors, status['to'])
+
+            form.pitchNumber.data = ""
+            return render_template('sendPitch.html', form=form, success=sentSuccess, errors=errors) #TODO: insert array to tell which ones failed
 
     elif request.method == 'GET':
         return render_template('sendPitch.html', form=form)
 
 @app.route('/addDiscussionThread', methods=['GET', 'POST'])
 def addDiscussionThread():
+    if 'email' not in session:
+        return redirect(url_for('signin'))
 
-  if 'email' not in session:
-    return redirect(url_for('signin'))
+    user = Smarketer.query.filter_by(username = session['email']).first()
 
-  user = Smarketer.query.filter_by(username = session['email']).first()
-  savedDiscussionThread = False
-
-  def saveDiscussionThread():
-    #saves new discussionThread in database
-    newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data, form.title.data)
-    db.session.add(newDiscussionThread)
-    db.session.commit()
-    savedDiscussionThread = True
-
-
-  if user is None:
-    return redirect(url_for('signin'))
-  else:
-    form = DiscussionThreadForm()
+    if user is None:
+        return redirect(url_for('signin'))
+    else:
+        form = DiscussionThreadForm()
 
     if request.method == 'POST':
-      if form.validate() == False:
-        return render_template('addDiscussionThread.html', form=form)
+        if form.validate() == False:
+            return render_template('addDiscussionThread.html', form=form)
 
-      else:
-        script_path = os.path.abspath('./flaskApp')
-        commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
-        commands.append("--user='{}'".format( user.username ))
-        commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
-        commands.append("--first-name='{}'".format( user.firstName ))
-        commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
-        commands.append("--discuss-url='{}'".format( form.url.data ))
-        command = " ".join(commands)
-        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-        output = proc.communicate()
-        try:
-            comments = json.loads(output[0])
-        except:
-            comments = output[0]
-            err = 'CasperJS timed out'
-            print err
-            response = jsonify(msg=err)
-            return render_template('addDiscussionThread.html', isError=True, error=response, form=form)
+        else:
+            savedDiscussionThread = False
+            script_path = os.path.abspath('./flaskApp')
+            commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
+            commands.append("--user='{}'".format( user.username ))
+            commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
+            commands.append("--first-name='{}'".format( user.firstName ))
+            commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
+            commands.append("--discuss-url='{}'".format( form.url.data ))
+            command = " ".join(commands)
+            proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+            output = proc.communicate()
+            try:
+                comments = json.loads(output[0])
+            except:
+                comments = output[0]
+                return render_template('addDiscussionThread.html', isError=True, error=comments, form=form)
 
-        for c in comments:
-            userID = c["userID"]
-            name = c["name"]
-            firstName = c["fname"]
-            lastName = c["lname"]
-            byline = c["byline"]
-            userID = c["userID"]
-            discussionURL = form.url.data
-            likesCount = c["likes"]
-            profileURL = c["profileURL"]
-            isFirstDegree = c["isFirstDegree"]
-            connection = c["connection"]
-            imageURL = c["image_src"]
-            comment = c["comment"]
+            for c in comments:
+                userID = c["userID"]
+                name = c["name"]
+                firstName = c["fname"]
+                lastName = c["lname"]
+                byline = c["byline"]
+                userID = c["userID"]
+                discussionURL = form.url.data
+                likesCount = c["likes"]
+                profileURL = c["profileURL"]
+                isFirstDegree = c["isFirstDegree"]
+                connection = c["connection"]
+                imageURL = c["image_src"]
+                comment = c["comment"]
 
-            #saves new warehousePerson to database
-            newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+                #saves new warehousePerson to database
+                newWarehousePerson = WarehousePeople(userID, firstName, lastName, byline, discussionURL, comment, likesCount, profileURL, imageURL)
+                if not savedDiscussionThread:
+                    newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data, form.title.data)
+                    db.session.add(newDiscussionThread)
+                    db.session.commit()
+                    savedDiscussionThread = True
+                db.session.add(newWarehousePerson)
+                db.session.commit()
 
-	    if savedDiscussionThread == False:
-              saveDiscussionThread()
-
-            db.session.add(newWarehousePerson)
-
-        db.session.commit()
-
-	if savedDiscussionThread:
-	  form.title.data = ""
-	  form.url.data = ""
-	  return render_template('addDiscussionThread.html', form=form, success=savedDiscussionThread)
+            if savedDiscussionThread:
+                form.title.data = ""
+                form.url.data = ""
+                return render_template('addDiscussionThread.html', form=form, success=savedDiscussionThread)
 
     elif request.method == 'GET':
       return render_template('addDiscussionThread.html', form=form)
