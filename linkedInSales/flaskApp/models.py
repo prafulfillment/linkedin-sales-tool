@@ -94,8 +94,7 @@ class Replies(db.Model):
 
 class WarehousePeople(db.Model):
   __tablename__ = 'warehousePeople'
-  warehousePeopleID = db.Column(db.Integer, primary_key = True)
-  userID = db.Column(db.Integer)
+  userID = db.Column(db.Integer, primary_key = True)
   firstName = db.Column(db.String(255))
   lastName = db.Column(db.String(255))
   byline = db.Column(db.String(255))
