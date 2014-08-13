@@ -30,7 +30,9 @@ class ConversationStarters(db.Model):
     self.smarketerPitched = smarketerPitched
     self.pitchID = pitchID
     #TODO: make connectionDistance work
-    self.connectionDistance = 0
+    self.connectionDistance = -1
+    self.isFirstDegree = False
+    self.isReplied = False
 
 class Smarketer(db.Model):
   __tablename__ = 'smarketers'
@@ -38,15 +40,15 @@ class Smarketer(db.Model):
   firstName = db.Column(db.String(255))
   username = db.Column(db.String(255), unique=True)
   password = db.Column(db.String(255))
-  
+
   def __init__(self, firstName, username, password):
     self.firstName = firstName.title()
     self.username = username.lower()
     self.set_password(password)
-    
+
   def set_password(self, password):
     self.password = aes_encrypt(password)
-  
+
   def check_password(self, password):
     return password == aes_decrypt(self.password)
 
@@ -91,7 +93,7 @@ class Replies(db.Model):
     self.message = message
 
 class WarehousePeople(db.Model):
-  __tablename__ = 'warehousePeople'  
+  __tablename__ = 'warehousePeople'
   warehousePeopleID = db.Column(db.Integer, primary_key = True)
   userID = db.Column(db.Integer)
   firstName = db.Column(db.String(255))
@@ -114,6 +116,7 @@ class WarehousePeople(db.Model):
     self.likesCount = likesCount
     self.profileURL = profileURL
     self.imageURL = imageURL
+    self.isPitched = False
 
 class Pitch(db.Model):
   __tablename__ = 'pitches'
