@@ -163,13 +163,14 @@ def sendPitch():
             for p in form.pitchNumber.data:
                 pitch_commands = []
                 pitch_commands.append("--to-user-id='{}'".format(p[pitchWarehousePeople]))
-                pitch_commands.append("--pitch-subject=")pitch.subject
-                pitch_commands.append("--pitch-body=")pitch.message
-                pitch_commands.append("--group-id=")discussionThread.groupID
+                pitch_commands.append("--pitch-subject={}".format(pitch.subject))
+                pitch_commands.append("--pitch-body={}".format(pitch.message))
+                pitch_commands.append("--group-id={}".format(discussionThread.groupID))
                 pitch_command = "{0} {1}".format(base_command, " ".join(pitch_commands))
                 proc = subprocess.Popen(pitch_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 output = proc.communicate()
                 status = json.loads(output[0])
+                # status will look like: {'sent': boolean, 'to': toUserID}
 
                 #TODO: open subprocess, return true or false for this warehousePerson
 
