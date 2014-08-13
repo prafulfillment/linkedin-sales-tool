@@ -5,6 +5,7 @@ from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch, ConversationStarters, Replies
 import subprocess
 import json
+import os
 
 mail = Mail()
 
@@ -128,7 +129,8 @@ def addPitch():
 def sendPitch():
     # TODO: Create a form for the remaining fields
     user = Smarketer.query.filter_by(username = session['email']).first()
-    commands = []
+    script_path = os.path.abspath('./flaskApp')
+    commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
     commands.append("--user='{}'".format( user.username ))
     commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
     commands.append("--first-name='{}'".format( user.firstName ))
@@ -169,15 +171,15 @@ def addDiscussionThread():
         return render_template('addDiscussionThread.html', form=form)
 
       else:
-
-        commands = []
+        script_path = os.path.abspath('./flaskApp')
+        commands = ['casperjs {}/linkedin-sales.js'.format(script_path)]
         commands.append("--user='{}'".format( user.username ))
         commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
         commands.append("--first-name='{}'".format( user.firstName ))
         commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
         commands.append("--discuss-url='{}'".format( form.url.data ))
         command = " ".join(commands)
-        proc = subprocess.Popen(command, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
         output = proc.communicate()
         try:
             comments = json.loads(output[0])
