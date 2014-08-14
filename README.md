@@ -232,7 +232,6 @@ click import database from dropbox/derivative/derivative
                                       True  
                         <--------------  
                          True
-<<<<<<< HEAD
 =======
 
 #Database Diagram
@@ -247,4 +246,3 @@ click import database from dropbox/derivative/derivative
 * replies are messages sent after the initial message of a conversationStarter between a smarketer and a warehousePeople
 
 ![Screen Shot 2014-08-07 at 12.38.56 PM.png](https://bitbucket.org/repo/qAbGER/images/2154469389-Screen%20Shot%202014-08-07%20at%2012.38.56%20PM.png)
->>>>>>> 1a018486109a40cf25d90a4660945144eaf17ee4
