@@ -1,5 +1,6 @@
 from flaskApp import app
 from flask import render_template, request, flash, session, url_for, redirect, jsonify
+from jinja2 import Template
 from forms import ContactForm, SignupForm, SigninForm, GroupForm, DiscussionThreadForm, PitchForm, ConversationStartersForm
 from flask.ext.mail import Message, Mail
 from models import db, Smarketer, Group, DiscussionThread, aes_decrypt, WarehousePeople, Pitch, ConversationStarters, Replies
@@ -158,18 +159,31 @@ def sendPitch():
             commands.append("--pass='{}'".format( aes_decrypt(user.password) ))
             commands.append("--first-name='{}'".format( user.firstName ))
             commands.append("--cookies-file='{}-cookies.txt'".format( user.firstName ))
-            commands.append("--send-pitch={}".format('false'))
+            commands.append("--send-pitch='{}'".format('false'))
             base_command = " ".join(commands)
 
             errors = "Failed IDs: "
             sentSuccess = None
 
             for p in xrange(number_pitches):
+                warehousePerson = pitchWarehousePeople[p]
+
                 pitch_commands = []
-                pitch_commands.append("--to-user-id='{}'".format(pitchWarehousePeople[p].userID))
-                pitch_commands.append("--pitch-subject={}".format(pitch.subject))
-                pitch_commands.append("--pitch-body={}".format(pitch.message))
-                pitch_commands.append("--group-id={}".format(discussionThread.groupID))
+                pitch_commands.append("--to-user-id='{}'".format(warehousePerson.userID))
+
+                subject = Template(pitch.subject)
+                message = Template(pitch.message)
+
+                rendered_subject =  subject.render(warehousePerson=warehousePerson,
+                        discussionThread=discussionThread,
+                        user=user).replace("'", "'\\''")
+                rendered_message =  message.render(warehousePerson=warehousePerson,
+                        discussionThread=discussionThread,
+                        user=user).replace("'", "'\\''").replace('\n', '\\n')
+
+                pitch_commands.append("--pitch-subject='{}'".format(rendered_subject))
+                pitch_commands.append("--pitch-body='{}'".format(rendered_message))
+                pitch_commands.append("--group-id='{}'".format(discussionThread.groupID))
                 pitch_command = "{0} {1}".format(base_command, " ".join(pitch_commands))
                 proc = subprocess.Popen(pitch_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 output = proc.communicate()
