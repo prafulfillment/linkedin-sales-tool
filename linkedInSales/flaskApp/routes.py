@@ -230,7 +230,6 @@ def addDiscussionThread():
                 firstName = c["fname"]
                 lastName = c["lname"]
                 byline = c["byline"]
-                userID = c["userID"]
                 discussionURL = form.url.data
                 likesCount = c["likes"]
                 profileURL = c["profileURL"]
@@ -245,9 +244,11 @@ def addDiscussionThread():
                     newDiscussionThread = DiscussionThread(form.url.data, form.groupID.data, form.title.data)
                     db.session.add(newDiscussionThread)
                     db.session.commit()
-                    savedDiscussionThread = True
-                db.session.add(newWarehousePerson)
-                db.session.commit()
+                    savedDiscussionThread = True 
+                warehousePersonExists = WarehousePeople.query.filter_by(userID = userID).first()
+		if warehousePersonExists == False:
+                    db.session.add(newWarehousePerson)
+                    db.session.commit()
 
             if savedDiscussionThread:
                 form.title.data = ""
