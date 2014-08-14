@@ -14,56 +14,57 @@ test-retreive.html is a working example for retrieving all the userids in our da
 
 Download the latest vagrant build with:
 
-vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box
+1. vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
+ 
+2. vagrant up
+ 
+3. vagrant ssh
 
-(or vagrant box add hashicorp/precise32 for a new one)
+4. sudo apt-get install git
 
-vagrant up
+5. git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
 
-vagrant ssh
+6. sudo apt-get install python-pip
 
-sudo apt-get install git
+7. sudo apt-get update
 
-git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
+8. sudo apt-get install apache2 mysql-server libapache2-mod-auth-mysql php5-mysql php5 libapache2-mod-php5 php5-mcrypt phpmyadmin python-dev python-mysqldb vim
 
-sudo apt-get install python-pip
+9. sudo pip install flask SQLAlchemy flask-mail flask-wtf pycrypto Flask-SQLAlchemy
 
-sudo pip install flask
+10. exit
 
-sudo pip install SQLAlchemy
+*In your terminal*
 
-sudo apt-get update
+11. vim VagrantFile
+  config.vm.network "forwarded_port", guest: 5000, host: 5000 
+  config.vm.network "forwarded_port", guest: 80, host: 4999
 
-sudo apt-get install apache2
+12. vagrant reload
 
-sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql
+*Back in your vagrant
 
-sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt
+13. vagrant ssh
 
-sudo apt-get install phpmyadmin
+14. sudo ln -s /usr/share/phpmyadmin/ /var/www/phpmyadmin
 
-sudo pip install Flask-SQLAlchemy
+15. sudo /etc/init.d/apache2 restart
 
-sudo apt-get install python-dev
+*In the browser
 
-sudo pip install pycrypto
+16. Go to localhost:4999/phpmyadmin
+create database called linkedInSales
+click import database from dropbox/derivative/derivative
 
-sudo pip install flask-wtf
+*In the vagrant again
 
-sudo pip install flask-mail
+17. cd linkedin-sales-tool/linkedInSales/
 
+18. python runserver.py
 
-Run the program with:
+*In the browser
 
-casperjs test.js
-
-### Definitions
-
-A Comment is:
-
-
-A Conversation is:
-
+19. Go to localhost:5000
 
 
 
