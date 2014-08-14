@@ -11,7 +11,7 @@
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
-  {% for message in form.title.errors %}
+  {% for message in form.groupTitle.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
@@ -21,8 +21,8 @@
     {{ form.groupID.label }}
     {{ form.groupID }}
 
-    {{ form.title.label }}
-    {{ form.title }}
+    {{ form.groupTitle.label }}
+    {{ form.groupTitle }}
 
     {{ form.submit }}
   </form>

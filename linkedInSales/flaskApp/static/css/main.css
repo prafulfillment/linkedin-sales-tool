@@ -35,8 +35,12 @@ header h1.logo:hover {
   margin: 0 auto;
 }
 
+.lowerContainer {
+  width: 940px;
+}
+
 div.jumbo {
-  padding: 10px 0 30px 0;
+  padding: 30px 0 30px 0;
   background-color: #eeeeee;
   -webkit-border-radius: 6px;
      -moz-border-radius: 6px;
@@ -79,6 +83,22 @@ h3 {
   text-decoration: none;
 }
 
+.lowerMenu {
+}
+
+.lowerMenu li {
+  display: inline;
+}
+
+.lowerMenu li + li {
+  margin-left: 35px;
+}
+
+.lowerMenu li a {
+  color: #999;
+  text-decoration: none;
+}
+
 /* Contact form */
 form label {
   font-size: 1.2em;
@@ -87,8 +107,17 @@ form label {
   padding: 10px 0;
 }
 
+form select#discussionThreadURL,
+form select#pitchID,
+form select#groupID,
 form input#name,
 form input#email,
+form input#title,
+form input#groupID,
+form input#url,
+form input#pitchTitle,
+form input#groupTitle,
+form input#pitchNumber,
 form input#subject {
   width: 400px;
   background-color: #fafafa;
@@ -98,6 +127,12 @@ form input#subject {
   border: 1px solid #cccccc;
   padding: 5px;
   font-size: 1.1em;
+}
+
+form input#url,
+form input#pitchNumber,
+form input#groupTitle {
+  margin-bottom: 10px;
 }
 
 form textarea#message {

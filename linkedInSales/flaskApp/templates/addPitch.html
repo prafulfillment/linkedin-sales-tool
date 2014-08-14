@@ -32,15 +32,15 @@
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
-  {% for message in form.groupTitle.errors %}
+  {% for message in form.pitchTitle.errors %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
   <form action="{{ url_for('addPitch') }}" method=post>
     {{ form.hidden_tag() }}
 
-    {{ form.groupTitle.label }}
-    {{ form.groupTitle }}
+    {{ form.pitchTitle.label }}
+    {{ form.pitchTitle }}
 
     {{ form.subject.label }}
     {{ form.subject }}
