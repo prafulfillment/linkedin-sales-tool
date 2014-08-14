@@ -8,7 +8,7 @@ This is the AUTOLINKER. A program to automatically send out messages to people o
 
 ### How do I get set up? ###
 
-Download the latest vagrant build with:
+"In your terminal*
 
 1. vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
  
@@ -30,7 +30,7 @@ Download the latest vagrant build with:
 
 10. exit
 
-*In your terminal*
+*back in your terminal outside of vagrant*
 
 11. vim VagrantFile
   config.vm.network "forwarded_port", guest: 5000, host: 5000 
@@ -52,13 +52,13 @@ Download the latest vagrant build with:
 create database called linkedInSales
 click import database from dropbox/derivative/derivative
 
-*In the vagrant again*
+*In vagrant again*
 
 17. cd linkedin-sales-tool/linkedInSales/
 
 18. python runserver.py
 
-*In the browser
+*In the browser*
 
 19. Go to localhost:5000
 
@@ -91,10 +91,10 @@ click import database from dropbox/derivative/derivative
                         Dash         Flask         DB
                        
                          ------------->
-                          POST: /add_user
+                          POST: /signup
                            username, password, firstName
                                       ------------->
-                                       ROUTE: 
+                                       ROUTE: addSmarketer
                                         username, password, firstName
                                      <-------------  
                                       True  
@@ -108,11 +108,11 @@ click import database from dropbox/derivative/derivative
                         Dash         Flask         DB
                        
                          ------------->
-                          POST: /add_group
-                           groupID
+                          POST: /addGroup
+                           groupID, title
                                       ------------->
-                                       ROUTE: 
-                                        groupID
+                                       ROUTE: addGroup
+                                        groupID, title
                                      <-------------  
                                       True  
           
@@ -124,7 +124,7 @@ click import database from dropbox/derivative/derivative
                         Dash         Flask         DB          Casper           LinkedIn
 
                          ------------->
-                         POST: /goto_discussion
+                         POST: /addDiscussionThread
                                User
                                Discussion URL                 
                                        ----------->
@@ -165,11 +165,11 @@ click import database from dropbox/derivative/derivative
                         Dash         Flask         DB
 
                         -------------->
-                        POST: /add_pitch  
-                              Pitch  
+                        POST: /addPitch  
+                              subject, message, title
                                      ------------->  
-                                     POST: /store_pitch  
-                                           Pitch  
+                                     ROUTE: addPitch 
+                                           subject, message, title
                                      <-------------  
                                       True  
                         <--------------  
@@ -219,15 +219,13 @@ click import database from dropbox/derivative/derivative
                         Dash         Flask         DB
 
                         -------------->
-                        POST: /add_reply  
-                        reply,
-                        send profile url / user
-                        recipient profile url / user 
+                        POST: addReply  
+                        message, fromWarehousePerson?,
+                        fromSmarketer?, conversationStarterID
                                      ------------->  
-                                     POST: /store_reply  
-                                     reply,
-                                     send profile url / user
-                                     recipient profile url / user 
+                                     ROUTE: addReply
+                                     message, fromWarehousePerson?,
+                                     fromSmarketer?, conversationStarterID 
                                      <-------------  
                                       True  
                         <--------------  
