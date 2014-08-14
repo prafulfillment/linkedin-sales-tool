@@ -54,13 +54,21 @@ click import database from dropbox/derivative/derivative
 
 *In vagrant again*
 
-17. cd linkedin-sales-tool/linkedInSales/
+17. git clone git://github.com/n1k0/casperjs.git
+   
+18. cd casperjs
 
-18. python runserver.py
+19. ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+
+MAKE CASPERJS/PHANTOMJS WORK PRAFUL
+
+20. cd linkedin-sales-tool/linkedInSales/
+
+21. python runserver.py
 
 *In the browser*
 
-19. Go to localhost:5000
+22. Go to localhost:5000
 
 
 
