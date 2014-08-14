@@ -107,6 +107,9 @@ form label {
   padding: 10px 0;
 }
 
+form select#discussionThreadURL,
+form select#pitchID,
+form select#groupID,
 form input#name,
 form input#email,
 form input#title,
