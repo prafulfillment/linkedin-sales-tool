@@ -58,7 +58,7 @@ click import database from dropbox/derivative/derivative
    
 18. cd casperjs
 
-19. ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+19. sudo ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
 
 MAKE CASPERJS/PHANTOMJS WORK PRAFUL
 
