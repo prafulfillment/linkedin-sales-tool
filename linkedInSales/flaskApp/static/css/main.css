@@ -35,6 +35,10 @@ header h1.logo:hover {
   margin: 0 auto;
 }
 
+.lowerContainer {
+  width: 940px;
+}
+
 div.jumbo {
   padding: 30px 0 30px 0;
   background-color: #eeeeee;
@@ -75,6 +79,22 @@ h3 {
 }
 
 .menu li a {
+  color: #999;
+  text-decoration: none;
+}
+
+.lowerMenu {
+}
+
+.lowerMenu li {
+  display: inline;
+}
+
+.lowerMenu li + li {
+  margin-left: 35px;
+}
+
+.lowerMenu li a {
   color: #999;
   text-decoration: none;
 }

@@ -21,20 +21,23 @@
           {% endif %}
         </ul>
       </nav>
+    </div>
+    <br />` 
+    <div class="lowerContainer">
       <nav>
-        <ul class="menu">
+        <ul class="lowerMenu">
           {% if 'email' in session %}
-          <li><a href="{{ url_for('addGroup') }}">Add Group</a></li>
-          <li><a href="{{ url_for('addDiscussionThread') }}">Add DiscussionThread</a></li>
-          <li><a href="{{ url_for('addPitch') }}">Add Pitch</a></li>
-          <li><a href="{{ url_for('sendPitch') }}">Send Pitch</a></li>
+          <li><a href="{{ url_for('addGroup') }}">1. Add Group</a></li>
+          <li><a href="{{ url_for('addDiscussionThread') }}">2. Add DiscussionThread</a></li>
+          <li><a href="{{ url_for('addPitch') }}">3. Add Pitch</a></li>
+          <li><a href="{{ url_for('sendPitch') }}">4. Send Pitch</a></li>
           {% else %}
           {% endif %}
         </ul>
       </nav>
     </div>
   </header>
-
+    <br />
     <div class="container">
       {% block content %}
       {% endblock %}
