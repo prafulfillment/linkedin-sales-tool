@@ -1,14 +1,10 @@
 # README #
 
-This is CasperJS/PhantomJS with Firebase. A complete javascript solution.
+This is a CasperJS/PhantomJS-PHP/MySQL/Apache2-Flask/Jinja2/MySQL mess.
 
 ### What is this repository for? ###
 
-test.js is the program. It runs through linkedIn threads and creates messages to send to people. Currently, I want it to run through the first 10 people of the thread I already messaged and automatically submit them to our firebase database to make sure that works.
-
-test-manual.html is a working example for submitting to our database using text fields.
-
-test-retreive.html is a working example for retrieving all the userids in our database so our program can check against them before sending so we don't have an repeats.
+This is the AUTOLINKER. A program to automatically send out messages to people on linkedIn.
 
 ### How do I get set up? ###
 
@@ -42,7 +38,7 @@ Download the latest vagrant build with:
 
 12. vagrant reload
 
-*Back in your vagrant
+*Back in your vagrant*
 
 13. vagrant ssh
 
@@ -50,13 +46,13 @@ Download the latest vagrant build with:
 
 15. sudo /etc/init.d/apache2 restart
 
-*In the browser
+*In the browser*
 
 16. Go to localhost:4999/phpmyadmin
 create database called linkedInSales
 click import database from dropbox/derivative/derivative
 
-*In the vagrant again
+*In the vagrant again*
 
 17. cd linkedin-sales-tool/linkedInSales/
 
