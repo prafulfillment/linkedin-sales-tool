@@ -89,6 +89,12 @@ form label {
 
 form input#name,
 form input#email,
+form input#title,
+form input#groupID,
+form input#url,
+form input#pitchTitle,
+form input#groupTitle,
+form input#pitchNumber,
 form input#subject {
   width: 400px;
   background-color: #fafafa;
@@ -98,6 +104,12 @@ form input#subject {
   border: 1px solid #cccccc;
   padding: 5px;
   font-size: 1.1em;
+}
+
+form input#url,
+form input#pitchNumber,
+form input#groupTitle {
+  margin-bottom: 10px;
 }
 
 form textarea#message {

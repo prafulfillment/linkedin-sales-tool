@@ -12,7 +12,7 @@ class ContactForm(Form):
 
 class GroupForm(Form):
   groupID = TextField("groupID",  [validators.Required("Please enter the groupID")])
-  title = TextField("title",  [validators.Required("Please enter the group title")])
+  groupTitle = TextField("title",  [validators.Required("Please enter the group title")])
   submit = SubmitField("Add a group")
 
   def __init__(self, *args, **kwargs):
@@ -32,7 +32,7 @@ class GroupForm(Form):
 class PitchForm(Form):
   subject = TextField("subject",  [validators.Required("Please enter the subject")])
   message = TextAreaField("message",  [validators.Required("Please enter the message")])
-  groupTitle = TextField("title",  [validators.Required("Please enter the title")])
+  pitchTitle = TextField("title",  [validators.Required("Please enter the title")])
   submit = SubmitField("Add a pitch")
 
   def __init__(self, *args, **kwargs):

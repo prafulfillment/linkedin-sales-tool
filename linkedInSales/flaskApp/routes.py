@@ -89,13 +89,13 @@ def addGroup():
       if form.validate() == False:
         return render_template('addGroup.html', form=form)
       else:
-	totalTitle = form.title.data + " - " + form.groupID.data
+	totalTitle = form.groupTitle.data + " - " + form.groupID.data
         newGroup = Group(form.groupID.data, totalTitle)
         db.session.add(newGroup)
         db.session.commit()
 
 	form.groupID.data = ""
-	form.title.data = ""
+	form.groupTitle.data = ""
         return render_template('addGroup.html', form=form, success=True)
 
     elif request.method == 'GET':
@@ -118,13 +118,13 @@ def addPitch():
       if form.validate() == False:
         return render_template('addPitch.html', form=form)
       else:
-        newPitch = Pitch(form.subject.data, form.message.data, form.groupTitle.data)
+        newPitch = Pitch(form.subject.data, form.message.data, form.pitchTitle.data)
         db.session.add(newPitch)
         db.session.commit()
 
         form.subject.data = ""
 	form.message.data = ""
-	form.groupTitle.data = ""
+	form.pitchTitle.data = ""
 	return render_template('addPitch.html', form=form, success=True)
 
     elif request.method == 'GET':

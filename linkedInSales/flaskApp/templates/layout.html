@@ -12,7 +12,6 @@
       <nav>
         <ul class="menu">
           <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('about') }}">About</a></li>
           <li><a href="{{ url_for('contact') }}">Contact</a></li>
           {% if 'email' in session %}
           <li><a href="{{ url_for('profile') }}">Dashboard</a></li>
@@ -22,7 +21,6 @@
 	  <li><a href="{{ url_for('addPitch') }}">Add Pitch</a></li>
 	  <li><a href="{{ url_for('sendPitch') }}">Send Pitch</a></li>
 	  {% else %}
-          <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
           <li><a href="{{ url_for('signin') }}">Sign In</a></li>
           {% endif %}
         </ul>
