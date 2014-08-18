@@ -12,9 +12,9 @@ This is the AUTOLINKER. A program to automatically send out messages to people o
 
 ```bash
 # Import CasperJS box
-vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
-vagrant init linkedin-message.box
-vim VagrantFile
+$ vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
+$ vagrant init linkedin-message.box
+$ vim VagrantFile
 ```
 
 ```vim
@@ -25,23 +25,23 @@ config.vm.network "forwarded_port", guest: 80, host: 4999
 **Setup Vagrant**
 
 ```bash
-vagrant reload
-vagrant up
-vagrant ssh
+$ vagrant reload
+$ vagrant up
+$ vagrant ssh
 
 # Install LinkedIn-Sales-Tool pre-requisites
-sudo apt-get update
-sudo apt-get install apache2 mysql-server libapache2-mod-auth-mysql php5-mysql php5 libapache2-mod-php5 php5-mcrypt phpmyadmin python-dev python-mysqldb vim
-sudo apt-get install python-pip
-sudo apt-get install git
-sudo pip install flask SQLAlchemy flask-mail flask-wtf pycrypto Flask-SQLAlchemy
+$ sudo apt-get update
+$ sudo apt-get install apache2 mysql-server libapache2-mod-auth-mysql php5-mysql php5 libapache2-mod-php5 php5-mcrypt phpmyadmin python-dev python-mysqldb vim
+$ sudo apt-get install python-pip
+$ sudo apt-get install git
+$ sudo pip install flask SQLAlchemy flask-mail flask-wtf pycrypto Flask-SQLAlchemy
 
 # Setup PHPMyAdmin
-sudo ln -s /usr/share/phpmyadmin/ /var/www/phpmyadmin
-sudo /etc/init.d/apache2 restart
+$ sudo ln -s /usr/share/phpmyadmin/ /var/www/phpmyadmin
+$ sudo /etc/init.d/apache2 restart
 
 # Pull LinkedIn-Sales-Tool
-git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
+$ git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
 
 ```
 
@@ -56,23 +56,23 @@ http://localhost:4999/phpmyadmin
 
 ```bash
 # Install PhantomJS pre-requisites
-sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-dev
+$ sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-dev
 
 # Install PhantomJS
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
-tar xvjf phantomjs-1.9.7-linux-x86_64.tar.bz2
-sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+$ wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
+$ tar xvjf phantomjs-1.9.7-linux-x86_64.tar.bz2
+$ sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 
 # Install Casper
-git clone git://github.com/n1k0/casperjs.git 
-cd casperjs 
-ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+$ git clone git://github.com/n1k0/casperjs.git 
+$ cd casperjs 
+$ ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
 ```
 
 **Run LinkedIn-Sales-Tool**
 
 ```bash
-python linkedInSales/runserver.py
+$ python linkedInSales/runserver.py
 ```
 
 http://localhost:5000
