@@ -45,16 +45,19 @@ $ git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
 
 ```
 
-**In the browser**
+**Setup Databases**
 
 http://localhost:4999/phpmyadmin
 
 1. Create database called linkedInSales
 2. Click import database from dropbox/derivative/derivative
 
-**In vagrant again**
+**Setup PhantomJS/CasperJS**
 
 ```bash
+# Go back into Vagrant
+$ vagrant ssh 
+
 # Install PhantomJS pre-requisites
 $ sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-dev
 
