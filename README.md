@@ -8,70 +8,74 @@ This is the AUTOLINKER. A program to automatically send out messages to people o
 
 ### How do I get set up? ###
 
-"In your terminal*
+**Import Vagrant**
 
-1. vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
- 
-2. vagrant up
- 
-3. vagrant ssh
+```bash
+# Import CasperJS box
+vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
+vagrant init linkedin-message.box
+vim VagrantFile
+```
 
-4. sudo apt-get install git
+```vim
+config.vm.network "forwarded_port", guest: 5000, host: 5000 
+config.vm.network "forwarded_port", guest: 80, host: 4999
+```
 
-5. git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
+**Setup Vagrant**
 
-6. sudo apt-get install python-pip
+```bash
+vagrant reload
+vagrant up
+vagrant ssh
 
-7. sudo apt-get update
+# Install LinkedIn-Sales-Tool pre-requisites
+sudo apt-get update
+sudo apt-get install apache2 mysql-server libapache2-mod-auth-mysql php5-mysql php5 libapache2-mod-php5 php5-mcrypt phpmyadmin python-dev python-mysqldb vim
+sudo apt-get install python-pip
+sudo apt-get install git
+sudo pip install flask SQLAlchemy flask-mail flask-wtf pycrypto Flask-SQLAlchemy
 
-8. sudo apt-get install apache2 mysql-server libapache2-mod-auth-mysql php5-mysql php5 libapache2-mod-php5 php5-mcrypt phpmyadmin python-dev python-mysqldb vim
+# Setup PHPMyAdmin
+sudo ln -s /usr/share/phpmyadmin/ /var/www/phpmyadmin
+sudo /etc/init.d/apache2 restart
 
-9. sudo pip install flask SQLAlchemy flask-mail flask-wtf pycrypto Flask-SQLAlchemy
+# Pull LinkedIn-Sales-Tool
+git clone https://USERNAMEHERE@bitbucket.org/dasickis/linkedin-sales-tool.git
 
-10. exit
+```
 
-*back in your terminal outside of vagrant*
+**In the browser**
 
-11. vim VagrantFile
-  config.vm.network "forwarded_port", guest: 5000, host: 5000 
-  config.vm.network "forwarded_port", guest: 80, host: 4999
+http://localhost:4999/phpmyadmin
 
-12. vagrant reload
+1. Create database called linkedInSales
+2. Click import database from dropbox/derivative/derivative
 
-*Back in your vagrant*
+**In vagrant again**
 
-13. vagrant ssh
+```bash
+# Install PhantomJS pre-requisites
+sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-dev
 
-14. sudo ln -s /usr/share/phpmyadmin/ /var/www/phpmyadmin
+# Install PhantomJS
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
+tar xvjf phantomjs-1.9.7-linux-x86_64.tar.bz2
+sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 
-15. sudo /etc/init.d/apache2 restart
+# Install Casper
+git clone git://github.com/n1k0/casperjs.git 
+cd casperjs 
+ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+```
 
-*In the browser*
+**Run LinkedIn-Sales-Tool**
 
-16. Go to localhost:4999/phpmyadmin
-create database called linkedInSales
-click import database from dropbox/derivative/derivative
+```bash
+python linkedInSales/runserver.py
+```
 
-*In vagrant again*
-
-17. git clone git://github.com/n1k0/casperjs.git
-   
-18. cd casperjs
-
-19. sudo ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
-
-MAKE CASPERJS/PHANTOMJS WORK PRAFUL
-
-20. cd linkedin-sales-tool/linkedInSales/
-
-21. python runserver.py
-
-*In the browser*
-
-22. Go to localhost:5000
-
-
-
+http://localhost:5000
 
 ### Network Diagram
 
