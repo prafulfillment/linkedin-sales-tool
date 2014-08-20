@@ -76,7 +76,7 @@ sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phant
 # Install Casper
 git clone git://github.com/n1k0/casperjs.git 
 cd casperjs 
-ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+sudo ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
 ```
 
 **Run LinkedIn-Sales-Tool**
