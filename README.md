@@ -70,6 +70,7 @@ sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-
 # Install PhantomJS
 wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
 tar xvjf phantomjs-1.9.7-linux-x86_64.tar.bz2
+sudo rm phantomjs-1.9.7-linux-x86_64.tar.bz2 
 sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
 
 # Install Casper
