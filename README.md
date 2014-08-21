@@ -63,20 +63,27 @@ $>
 
 # Go back into Vagrant
 vagrant ssh 
+cd linkedin-sales-tool/linkedInSales/
 
 # Install PhantomJS pre-requisites
 sudo apt-get install build-essential chrpath git-core libssl-dev libfontconfig1-dev
 
 # Install PhantomJS
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
-tar xvjf phantomjs-1.9.7-linux-x86_64.tar.bz2
-sudo rm phantomjs-1.9.7-linux-x86_64.tar.bz2 
-sudo ln -s `pwd`/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-i686.tar.bz2
+tar xvjf phantomjs-1.9.7-linux-i686.tar.bz2
+sudo rm phantomjs-1.9.7-linux-i686.tar.bz2
+sudo ln -s `pwd`/phantomjs-1.9.7-linux-i686.tar.bz2/bin/phantomjs /usr/local/bin/phantomjs
 
 # Install Casper
 git clone git://github.com/n1k0/casperjs.git 
 cd casperjs 
 sudo ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
+sudo apt-get install nodejs
+curl -L https://npmjs.org/install.sh | sudo sh
+sudo npm install -g underscore
+cd flaskApp
+npm install lodash-node
+cd ..
 ```
 
 **Run LinkedIn-Sales-Tool**
@@ -84,7 +91,7 @@ sudo ln -sf `pwd`/bin/casperjs /usr/local/bin/casperjs
 ```bash
 $>
 
-python linkedInSales/runserver.py
+python runserver.py
 ```
 
 http://localhost:5000
