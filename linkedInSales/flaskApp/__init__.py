@@ -1,9 +1,19 @@
 from flask import Flask
 from models import aes_decrypt
+from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
 
-app.secret_key = 'supersecretdevkey'
+# the toolbar is only enabled in debug mode:
+app.debug = True
+
+# set a 'SECRET_KEY' to enable the Flask session cookies
+app.config['SECRET_KEY'] = 'supersecretdevkey'
+
+toolbar = DebugToolbarExtension(app)
+
+app.secret_key = app.config['SECRET_KEY']
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 465
