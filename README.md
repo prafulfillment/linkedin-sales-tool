@@ -13,7 +13,6 @@ This is the AUTOLINKER. A program to automatically send out messages to people o
 ```bash
 $>
 
-# Import CasperJS box
 vagrant box add precise32 https://dl.dropboxusercontent.com/u/3132018/linkedin-message.box (or vagrant box add hashicorp/precise32 for a new one)
 vagrant init linkedin-message.box
 vim VagrantFile
